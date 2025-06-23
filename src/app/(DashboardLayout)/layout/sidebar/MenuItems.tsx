@@ -7,6 +7,11 @@ import {
   IconTypography,
   IconUserPlus,
   IconShoppingBag,
+  IconFileText,
+  IconArticle,
+  IconBook,
+  IconFiles,
+  IconEdit,
 } from "@tabler/icons-react";
 
 import { uniqueId } from "lodash";
@@ -24,9 +29,27 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: "Order List",
-    icon: IconShoppingBag,
-    href: "/order-list",
+    title: "Posts",
+    icon: IconEdit,
+    href: "/content/posts",
+  },
+  {
+    id: uniqueId(),
+    title: "Drafts",
+    icon: null,
+    href: "/content/drafts",
+  },
+  {
+    id: uniqueId(),
+    title: "Scheduled",
+    icon: null,
+    href: "/content/scheduled",
+  },
+  {
+    id: uniqueId(),
+    title: "Published",
+    icon: null,
+    href: "/content/published",
   },
   {
     navlabel: true,
