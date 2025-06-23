@@ -7,6 +7,10 @@ import {
   IconTypography,
   IconUserPlus,
   IconShoppingBag,
+  IconFileText,
+  IconArticle,
+  IconBook,
+  IconFiles,
 } from "@tabler/icons-react";
 
 import { uniqueId } from "lodash";
@@ -24,9 +28,9 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: "Order List",
-    icon: IconShoppingBag,
-    href: "/order-list",
+    title: "Content List",
+    icon: IconFiles,
+    href: "/content-list",
   },
   {
     navlabel: true,

@@ -2,9 +2,9 @@
 import React from "react";
 import PageContainer from "../components/container/PageContainer";
 import { Box, Grid } from "@mui/material";
-import OrderList from "../components/dashboard/OrderList";
+import ContentList from "../components/dashboard/ContentList";
 
-const orderListScreen = () => {
+const ContentListScreen = () => {
   return (
     <PageContainer title="Dashboard" description="this is Dashboard">
       <Box>
@@ -15,11 +15,11 @@ const orderListScreen = () => {
               lg: 12,
             }}
           >
-            <OrderList />
+            <ContentList />
           </Grid>
         </Grid>
       </Box>
     </PageContainer>
   );
 };
-export default orderListScreen;
+export default ContentListScreen;
