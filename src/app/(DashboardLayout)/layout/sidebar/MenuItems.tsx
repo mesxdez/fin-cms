@@ -11,6 +11,7 @@ import {
   IconArticle,
   IconBook,
   IconFiles,
+  IconEdit,
 } from "@tabler/icons-react";
 
 import { uniqueId } from "lodash";
@@ -28,9 +29,27 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: "Content List",
-    icon: IconFiles,
-    href: "/content-list",
+    title: "Posts",
+    icon: IconEdit,
+    href: "/content/posts",
+  },
+  {
+    id: uniqueId(),
+    title: "Drafts",
+    icon: null,
+    href: "/content/drafts",
+  },
+  {
+    id: uniqueId(),
+    title: "Scheduled",
+    icon: null,
+    href: "/content/scheduled",
+  },
+  {
+    id: uniqueId(),
+    title: "Published",
+    icon: null,
+    href: "/content/published",
   },
   {
     navlabel: true,

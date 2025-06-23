@@ -1,28 +1,48 @@
 import {
   Typography,
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   Chip,
   Avatar,
   IconButton,
+  Button,
+  Stack,
   Menu,
   MenuItem,
-  Button,
   Select,
   FormControl,
-  TablePagination,
   InputLabel,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  ListItemSecondaryAction,
+  Divider,
 } from "@mui/material";
-import { IconDots, IconPlus } from "@tabler/icons-react";
+import {
+  IconTrash,
+  IconPlus,
+  IconEdit,
+  IconChartBar,
+  IconPencil,
+  IconDots,
+  IconEye,
+} from "@tabler/icons-react";
 import DashboardCard from "@/app/(DashboardLayout)//components/shared/DashboardCard";
 import { useState } from "react";
 import EditContentModal from "../modal/EditContentModal";
 
-const contentItems = [
+// Helper for 'time ago' (simple version)
+function timeAgo(dateString: string) {
+  const now = new Date();
+  const date = new Date(dateString);
+  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diff < 60) return "a few seconds ago";
+  if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+  return `${Math.floor(diff / 86400)} days ago`;
+}
+
+export const contentItems = [
   {
     id: 1,
     title: "Getting Started with React",
@@ -43,7 +63,7 @@ const contentItems = [
     createdDate: "2023-09-14",
     updatedBy: "Jane Smith",
     updatedDate: "2023-09-16",
-    status: "Published",
+    status: "Draft",
   },
   {
     id: 3,
@@ -54,7 +74,7 @@ const contentItems = [
     createdDate: "2023-09-14",
     updatedBy: "Mike Johnson",
     updatedDate: "2023-09-14",
-    status: "Draft",
+    status: "Scheduled",
   },
   {
     id: 4,
@@ -65,7 +85,7 @@ const contentItems = [
     createdDate: "2023-09-14",
     updatedBy: "Sarah Wilson",
     updatedDate: "2023-09-17",
-    status: "Archived",
+    status: "Published",
   },
   {
     id: 5,
@@ -76,7 +96,7 @@ const contentItems = [
     createdDate: "2023-09-18",
     updatedBy: "Alex Brown",
     updatedDate: "2023-09-18",
-    status: "Published",
+    status: "Scheduled",
   },
   {
     id: 6,
@@ -131,9 +151,22 @@ const contentItems = [
     createdDate: "2023-09-23",
     updatedBy: "Rachel Green",
     updatedDate: "2023-09-23",
-    status: "Archived",
+    status: "Scheduled",
   },
 ];
+
+const statusColor = (status: string) => {
+  switch (status) {
+    case "Scheduled":
+      return "success";
+    case "Draft":
+      return "error";
+    case "Published":
+      return "default";
+    default:
+      return "default";
+  }
+};
 
 const ContentList = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -145,9 +178,12 @@ const ContentList = () => {
   const [editContent, setEditContent] = useState<any>(null);
   const [contents, setContents] = useState(contentItems);
 
-  // Pagination state
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  // Filters (dummy, not functional)
+  const [postFilter, setPostFilter] = useState("All posts");
+  const [accessFilter, setAccessFilter] = useState("All access");
+  const [authorFilter, setAuthorFilter] = useState("All authors");
+  const [tagFilter, setTagFilter] = useState("All tags");
+  const [sortFilter, setSortFilter] = useState("Newest first");
 
   const handleMenuClick = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -156,23 +192,15 @@ const ContentList = () => {
     setAnchorEl(event.currentTarget);
     setSelectedContentId(id);
   };
-
   const handleClose = () => {
     setAnchorEl(null);
     setSelectedContentId(null);
   };
-
   const handleCreate = () => {
     setIsEditMode(false);
-    setEditContent({
-      title: "",
-      textHtml: "",
-      banner: "",
-      status: "Draft",
-    });
+    setEditContent({ title: "", textHtml: "", banner: "", status: "Draft" });
     setIsModalOpen(true);
   };
-
   const handleEdit = (id: number) => {
     const content = contents.find((c) => c.id === id);
     if (content) {
@@ -182,30 +210,24 @@ const ContentList = () => {
     }
     handleClose();
   };
-
   const handleModalClose = () => {
     setIsModalOpen(false);
     setEditContent(null);
     setIsEditMode(false);
   };
-
   const handleModalSave = () => {
     if (isEditMode) {
-      console.log("Updating content:", editContent);
-      // Update the content in the list
       setContents((prev) =>
         prev.map((item) => (item.id === editContent.id ? editContent : item))
       );
     } else {
-      console.log("Creating new content:", editContent);
-      // Add new content to the list
       const newContent = {
         ...editContent,
         id: Math.max(...contents.map((c) => c.id)) + 1,
         createdBy: "Current User",
-        createdDate: new Date().toISOString().split("T")[0],
+        createdDate: new Date().toISOString(),
         updatedBy: "Current User",
-        updatedDate: new Date().toISOString().split("T")[0],
+        updatedDate: new Date().toISOString(),
       };
       setContents((prev) => [...prev, newContent]);
     }
@@ -213,290 +235,182 @@ const ContentList = () => {
     setEditContent(null);
     setIsEditMode(false);
   };
-
   const handleChange = (field: string, value: string | number) => {
-    setEditContent((prev: any) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setEditContent((prev: any) => ({ ...prev, [field]: value }));
   };
-
-  const handleStatusChange = (id: number, newStatus: string) => {
-    setContents((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              status: newStatus,
-              updatedBy: "Current User",
-              updatedDate: new Date().toISOString().split("T")[0],
-            }
-          : item
-      )
-    );
-    console.log(`Status changed for content ${id} to ${newStatus}`);
-  };
-
   const handleDelete = (id: number) => {
-    console.log("Delete content:", id);
     setContents((prev) => prev.filter((item) => item.id !== id));
     handleClose();
   };
-
-  // Pagination handlers
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
+  const handlePreview = (id: number) => {
+    //TODO: Implement preview
   };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Published":
-        return "success";
-      case "Draft":
-        return "warning";
-      case "Archived":
-        return "default";
-      default:
-        return "default";
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  const truncateHtml = (html: string, maxLength: number = 50) => {
-    const textContent = html.replace(/<[^>]*>/g, "");
-    return textContent.length > maxLength
-      ? textContent.substring(0, maxLength) + "..."
-      : textContent;
-  };
-
-  // Calculate paginated data
-  const paginatedContents = contents.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
 
   return (
-    <>
-      <DashboardCard
-        title="Content List"
-        action={
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<IconPlus size={20} />}
-            onClick={handleCreate}
+    <DashboardCard
+      title="Posts"
+      action={
+        <>
+          <Stack
+            direction="row"
+            spacing={1}
+            mb={3}
+            flexWrap="wrap"
+            alignItems="center"
           >
-            Create Content
-          </Button>
-        }
-      >
-        <Box sx={{ overflow: "auto", width: { xs: "280px", sm: "auto" } }}>
-          <Table
-            aria-label="content table"
-            sx={{
-              whiteSpace: "nowrap",
-              mt: 2,
-            }}
-          >
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    Title
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    Banner
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography
-                    variant="subtitle2"
-                    fontWeight={600}
-                    textAlign={"center"}
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <Select
+                value={postFilter}
+                onChange={(e) => setPostFilter(e.target.value)}
+              >
+                <MenuItem value="All posts">All posts</MenuItem>
+                <MenuItem value="Drafts">Drafts</MenuItem>
+                <MenuItem value="Scheduled">Scheduled</MenuItem>
+                <MenuItem value="Published">Published</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <Select
+                value={accessFilter}
+                onChange={(e) => setAccessFilter(e.target.value)}
+              >
+                <MenuItem value="All access">All access</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <Select
+                value={authorFilter}
+                onChange={(e) => setAuthorFilter(e.target.value)}
+              >
+                <MenuItem value="All authors">All authors</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <Select
+                value={tagFilter}
+                onChange={(e) => setTagFilter(e.target.value)}
+              >
+                <MenuItem value="All tags">All tags</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <Select
+                value={sortFilter}
+                onChange={(e) => setSortFilter(e.target.value)}
+              >
+                <MenuItem value="Newest first">Newest first</MenuItem>
+                <MenuItem value="Oldest first">Oldest first</MenuItem>
+              </Select>
+            </FormControl>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<IconPlus size={20} />}
+              onClick={handleCreate}
+            >
+              New post
+            </Button>
+          </Stack>
+        </>
+      }
+    >
+      {/* List of posts */}
+      <List disablePadding>
+        {contents.map((content, idx) => (
+          <>
+            <ListItem
+              key={content.id}
+              alignItems="flex-start"
+              sx={{
+                px: 0,
+                py: 2,
+                borderBottom:
+                  idx === contents.length - 1 ? "none" : "1px solid #f0f0f0",
+                "&:hover": { bgcolor: "#fafbfc" },
+                transition: "background 0.2s",
+              }}
+              secondaryAction={
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <IconButton
+                    onClick={() => handleEdit(content.id)}
+                    title="Edit"
+                    sx={{
+                      border: "1px solid #e0e0e0",
+                      borderRadius: 4,
+                      bgcolor: "#fff",
+                    }}
                   >
-                    Status
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    Created By
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    Created Date
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    Updated By
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    Updated Date
-                  </Typography>
-                </TableCell>
-                <TableCell align="right">
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    Actions
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedContents.map((content) => (
-                <TableRow key={content.id}>
-                  <TableCell>
+                    <IconPencil size={18} />
+                  </IconButton>
+                  <IconButton
+                    title="Preview"
+                    sx={{
+                      border: "1px solid #e0e0e0",
+                      borderRadius: 4,
+                      bgcolor: "#fff",
+                    }}
+                    onClick={() => handlePreview(content.id)}
+                  >
+                    <IconEye size={18} />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleDelete(content.id)}
+                    title="Delete"
+                    sx={{
+                      border: "1px solid #e0e0e0",
+                      borderRadius: 4,
+                      bgcolor: "#fff",
+                      color: "error.main",
+                    }}
+                  >
+                    <IconTrash size={18} />
+                  </IconButton>
+                </Stack>
+              }
+            >
+              <ListItemAvatar>
+                <Avatar
+                  src={content.banner}
+                  variant="square"
+                  sx={{ width: 56, height: 56, borderRadius: 2, mr: 2 }}
+                />
+              </ListItemAvatar>
+              <ListItemText
+                primary={
+                  <Stack direction="row" alignItems="center" spacing={2}>
                     <Typography
-                      sx={{
-                        fontSize: "15px",
-                        fontWeight: "500",
-                      }}
+                      variant="h6"
+                      fontWeight={600}
+                      sx={{ color: "#222" }}
                     >
                       {content.title}
                     </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Avatar
-                      src={content.banner}
-                      variant="square"
-                      sx={{
-                        height: 40,
-                        width: 60,
-                        borderRadius: "4px",
-                      }}
+                    <Chip
+                      label={content.status}
+                      color={statusColor(content.status)}
+                      size="small"
+                      sx={{ fontWeight: 500, textTransform: "capitalize" }}
                     />
-                  </TableCell>
-                  <TableCell sx={{ textAlign: "right" }}>
-                    <FormControl size="small" sx={{ minWidth: 120 }}>
-                      <Select
-                        value={content.status}
-                        onChange={(e) =>
-                          handleStatusChange(content.id, e.target.value)
-                        }
-                        sx={{
-                          "& .MuiSelect-select": {
-                            py: 0.5,
-                          },
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            border: "none",
-                          },
-                          "&:hover .MuiOutlinedInput-notchedOutline": {
-                            border: "none",
-                          },
-                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            border: "none",
-                          },
-                        }}
-                      >
-                        <MenuItem value="Draft">
-                          <Chip
-                            label="Draft"
-                            color="warning"
-                            size="small"
-                            variant="outlined"
-                          />
-                        </MenuItem>
-                        <MenuItem value="Published">
-                          <Chip
-                            label="Published"
-                            color="success"
-                            size="small"
-                            variant="outlined"
-                          />
-                        </MenuItem>
-                        <MenuItem value="Archived">
-                          <Chip
-                            label="Archived"
-                            color="default"
-                            size="small"
-                            variant="outlined"
-                          />
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="subtitle2">
-                      {content.createdBy}
+                  </Stack>
+                }
+                secondary={
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    alignItems="center"
+                    mt={0.5}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      By {content.createdBy} - {timeAgo(content.createdDate)}
                     </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {formatDate(content.createdDate)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="subtitle2">
-                      {content.updatedBy}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {formatDate(content.updatedDate)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      aria-controls={`menu-${content.id}`}
-                      aria-haspopup="true"
-                      onClick={(e) => handleMenuClick(e, content.id)}
-                    >
-                      <IconDots />
-                    </IconButton>
-                    <Menu
-                      id={`menu-${content.id}`}
-                      anchorEl={anchorEl}
-                      keepMounted
-                      open={selectedContentId === content.id}
-                      onClose={handleClose}
-                    >
-                      <MenuItem onClick={() => handleEdit(content.id)}>
-                        Edit
-                      </MenuItem>
-                      <MenuItem onClick={() => handleDelete(content.id)}>
-                        Delete
-                      </MenuItem>
-                    </Menu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          {/* Pagination */}
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={contents.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage="Rows per page:"
-            labelDisplayedRows={({ from, to, count }) =>
-              `${from}-${to} of ${count !== -1 ? count : `more than ${to}`}`
-            }
-          />
-        </Box>
-      </DashboardCard>
+                  </Stack>
+                }
+              />
+            </ListItem>
+            {idx !== contents.length - 1 && <Divider />}
+          </>
+        ))}
+      </List>
       <EditContentModal
         open={isModalOpen}
         content={editContent}
@@ -505,7 +419,7 @@ const ContentList = () => {
         onSave={handleModalSave}
         onChange={handleChange}
       />
-    </>
+    </DashboardCard>
   );
 };
 
