@@ -57,6 +57,12 @@ const Menuitems = [
     icon: IconTags,
     href: "/tags",
   },
+   {
+    id: uniqueId(),
+    title: "New Tags",
+    icon: null,
+    href: "/tags/new",
+  },
   {
     id: uniqueId(),
     title: "Members",
