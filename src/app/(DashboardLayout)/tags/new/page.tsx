@@ -1,8 +1,17 @@
 'use client';
 
 import {
-  Box, Button, Container, Grid, Stack, TextField, Typography,
-  Accordion, AccordionSummary, AccordionDetails, InputLabel, OutlinedInput
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Container,
+  InputLabel,
+  OutlinedInput,
+  Stack,
+  TextField,
+  Typography,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
@@ -23,60 +32,61 @@ export default function NewTagPage() {
   const [tagFooter, setTagFooter] = useState('');
 
   return (
-    <Container maxWidth="lg" sx={{ pt: 4 }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" fontWeight="bold">New tag</Typography>
-        <Button variant="contained" color="primary">Save</Button>
+    <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h5" fontWeight="bold">
+          New tag
+        </Typography>
+        <Button variant="contained" color="primary" sx={{ maxWidth: 500, width: '100%' }}>
+          Save
+        </Button>
+      </Box>
+
+      {/* Main Fields */}
+      <Stack spacing={3} sx={{ maxWidth: 500 }}>
+        <Box display="flex" gap={2}>
+          <TextField
+            label="Name"
+            fullWidth
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'));
+            }}
+            helperText="Start with # to create internal tags"
+          />
+          <Box>
+            <InputLabel shrink>Color</InputLabel>
+            <OutlinedInput
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              sx={{ width: 64, height: 56, padding: 0 }}
+            />
+          </Box>
+        </Box>
+
+        <TextField
+          label="Slug"
+          fullWidth
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          helperText="https://your-site.com/tag/[slug]"
+        />
+
+        <TextField
+          label="Description"
+          fullWidth
+          multiline
+          rows={4}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          helperText="Maximum: 500 characters"
+        />
       </Stack>
 
-      {/* 2-Column Main Fields */}
-      <Grid container spacing={4}>
-        {/* Left Column */}
-        <Grid item xs={12} md={6}>
-          <Stack spacing={3}>
-            <TextField
-              label="Name"
-              fullWidth
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'));
-              }}
-              helperText="Start with # to create internal tags"
-            />
-            <TextField
-              label="Slug"
-              fullWidth
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              helperText="https://your-site.com/tag/[slug]"
-            />
-            <TextField
-              label="Description"
-              fullWidth
-              multiline
-              rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              helperText="Maximum: 500 characters"
-            />
-          </Stack>
-        </Grid>
-
-        {/* Right Column */}
-        <Grid item xs={12} md={6}>
-          <InputLabel shrink>Color</InputLabel>
-          <OutlinedInput
-            type="color"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-            sx={{ width: '100px', height: '56px' }}
-          />
-        </Grid>
-      </Grid>
-
-      {/* Meta Data */}
-      <Accordion sx={{ mt: 5 }}>
+      {/* Meta Data Accordion */}
+      <Accordion sx={{ mt: 4, maxWidth: 500 }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography fontWeight="bold">Meta data</Typography>
         </AccordionSummary>
@@ -108,14 +118,16 @@ export default function NewTagPage() {
         </AccordionDetails>
       </Accordion>
 
-      {/* X Card */}
-      <Accordion sx={{ mt: 2 }}>
+      {/* X Card Accordion */}
+      <Accordion sx={{ mt: 2, maxWidth: 500 }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography fontWeight="bold">X card</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Stack spacing={2}>
-            <Button variant="outlined">Add X image</Button>
+            <Button variant="outlined" fullWidth>
+              Add X image
+            </Button>
             <TextField
               label="X title"
               fullWidth
@@ -136,14 +148,16 @@ export default function NewTagPage() {
         </AccordionDetails>
       </Accordion>
 
-      {/* Facebook Card */}
-      <Accordion sx={{ mt: 2 }}>
+      {/* Facebook Card Accordion */}
+      <Accordion sx={{ mt: 2, maxWidth: 500 }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography fontWeight="bold">Facebook card</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Stack spacing={2}>
-            <Button variant="outlined">Add Facebook image</Button>
+            <Button variant="outlined" fullWidth>
+              Add Facebook image
+            </Button>
             <TextField
               label="Facebook title"
               fullWidth
@@ -164,8 +178,8 @@ export default function NewTagPage() {
         </AccordionDetails>
       </Accordion>
 
-      {/* Code Injection */}
-      <Accordion sx={{ mt: 2, mb: 5 }}>
+      {/* Code Injection Accordion */}
+      <Accordion sx={{ mt: 2, maxWidth: 500 }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography fontWeight="bold">Code injection</Typography>
         </AccordionSummary>
