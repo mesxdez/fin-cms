@@ -93,6 +93,12 @@ const Menuitems = [
     icon: IconUsers,
     href: "/members",
   },
+   {
+    id: uniqueId(),
+    title: "New Member",
+    icon: null,
+    href: "/members/new",
+  },
 ];
 
 export default Menuitems;
