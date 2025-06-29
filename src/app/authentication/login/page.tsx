@@ -1,12 +1,15 @@
 "use client";
 import Link from "next/link";
 import { Grid, Box, Card, Stack, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 // components
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
 import AuthLogin from "../auth/AuthLogin";
 
 const Login2 = () => {
+  const theme = useTheme();
+
   return (
     <PageContainer title="Login" description="this is Login page">
       <Box
@@ -14,13 +17,16 @@ const Login2 = () => {
           position: "relative",
           "&:before": {
             content: '""',
-            background: "radial-gradient(#d2f1df, #d3d7fa, #bad8f4)",
+            background:
+              theme.palette.mode === "dark"
+                ? "radial-gradient(#1e293b, #0f172a, #374151)"
+                : "radial-gradient(#d2f1df, #d3d7fa, #bad8f4)",
             backgroundSize: "400% 400%",
             animation: "gradient 15s ease infinite",
             position: "absolute",
             height: "100%",
             width: "100%",
-            opacity: "0.3",
+            opacity: theme.palette.mode === "dark" ? "0.1" : "0.3",
           },
         }}
       >
@@ -38,8 +44,9 @@ const Login2 = () => {
               xs: 12,
               sm: 12,
               lg: 4,
-              xl: 3
-            }}>
+              xl: 3,
+            }}
+          >
             <Card
               elevation={9}
               sx={{ p: 4, zIndex: 1, width: "100%", maxWidth: "500px" }}

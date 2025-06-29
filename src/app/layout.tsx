@@ -1,9 +1,20 @@
 "use client";
-import { baselightTheme } from "@/utils/theme/DefaultColors";
-import { ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import './global.css'
+import { ThemeProvider } from "@/utils/ThemeContext";
+import { useTheme } from "@/utils/ThemeContext";
+import "./global.css";
 
+function AppContent({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+
+  return (
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline />
+      {children}
+    </MuiThemeProvider>
+  );
+}
 
 export default function RootLayout({
   children,
@@ -13,10 +24,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ThemeProvider theme={baselightTheme}>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
-          {children}
+        <ThemeProvider>
+          <AppContent>{children}</AppContent>
         </ThemeProvider>
       </body>
     </html>

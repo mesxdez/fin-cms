@@ -19,6 +19,7 @@ import {
 import { IconPencil, IconTrash, IconEye, IconPlus } from "@tabler/icons-react";
 import { ReactNode, useState } from "react";
 import DashboardCard from "../shared/DashboardCard";
+import { useTheme } from "@mui/material/styles";
 
 // Helper for 'time ago' (simple version)
 function timeAgo(dateString: string) {
@@ -188,16 +189,14 @@ const ContentListCore = ({
   title,
   onCreate,
 }: ContentListCoreProps) => {
-  // Filters (dummy, not functional)
+  const theme = useTheme();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [postFilter, setPostFilter] = useState("All posts");
   const [accessFilter, setAccessFilter] = useState("All access");
   const [authorFilter, setAuthorFilter] = useState("All authors");
   const [tagFilter, setTagFilter] = useState("All tags");
   const [sortFilter, setSortFilter] = useState("Newest first");
-
-  // Pagination state
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -210,10 +209,9 @@ const ContentListCore = ({
     setPage(0);
   };
 
-  const paginatedContents = contents.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+  const startIndex = page * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const paginatedContents = contents.slice(startIndex, endIndex);
 
   return (
     <DashboardCard
@@ -310,8 +308,13 @@ const ContentListCore = ({
                   borderBottom:
                     idx === paginatedContents.length - 1
                       ? "none"
-                      : "1px solid #f0f0f0",
-                  "&:hover": { bgcolor: "#fafbfc" },
+                      : `1px solid ${theme.palette.divider}`,
+                  "&:hover": {
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? "rgba(255, 255, 255, 0.04)"
+                        : "#fafbfc",
+                  },
                   transition: "background 0.2s",
                 }}
                 secondaryAction={
@@ -320,9 +323,16 @@ const ContentListCore = ({
                       onClick={() => onEdit(content.id)}
                       title="Edit"
                       sx={{
-                        border: "1px solid #e0e0e0",
+                        border: `1px solid ${theme.palette.divider}`,
                         borderRadius: 4,
-                        bgcolor: "#fff",
+                        bgcolor: theme.palette.background.paper,
+                        color: theme.palette.text.primary,
+                        "&:hover": {
+                          bgcolor:
+                            theme.palette.mode === "dark"
+                              ? "rgba(255, 255, 255, 0.08)"
+                              : "rgba(0, 0, 0, 0.04)",
+                        },
                       }}
                     >
                       <IconPencil size={18} />
@@ -331,9 +341,16 @@ const ContentListCore = ({
                       <IconButton
                         title="Preview"
                         sx={{
-                          border: "1px solid #e0e0e0",
+                          border: `1px solid ${theme.palette.divider}`,
                           borderRadius: 4,
-                          bgcolor: "#fff",
+                          bgcolor: theme.palette.background.paper,
+                          color: theme.palette.text.primary,
+                          "&:hover": {
+                            bgcolor:
+                              theme.palette.mode === "dark"
+                                ? "rgba(255, 255, 255, 0.08)"
+                                : "rgba(0, 0, 0, 0.04)",
+                          },
                         }}
                         onClick={() => onPreview(content.id)}
                       >
@@ -344,10 +361,16 @@ const ContentListCore = ({
                       onClick={() => onDelete(content.id)}
                       title="Delete"
                       sx={{
-                        border: "1px solid #e0e0e0",
+                        border: `1px solid ${theme.palette.divider}`,
                         borderRadius: 4,
-                        bgcolor: "#fff",
-                        color: "error.main",
+                        bgcolor: theme.palette.background.paper,
+                        color: theme.palette.error.main,
+                        "&:hover": {
+                          bgcolor:
+                            theme.palette.mode === "dark"
+                              ? "rgba(244, 67, 54, 0.08)"
+                              : "rgba(244, 67, 54, 0.04)",
+                        },
                       }}
                     >
                       <IconTrash size={18} />
@@ -368,7 +391,7 @@ const ContentListCore = ({
                       <Typography
                         variant="h6"
                         fontWeight={600}
-                        sx={{ color: "#222" }}
+                        sx={{ color: theme.palette.text.primary }}
                       >
                         {content.title}
                       </Typography>

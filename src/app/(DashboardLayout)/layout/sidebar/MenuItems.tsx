@@ -1,11 +1,15 @@
 import {
-  
   IconLayoutDashboard,
   IconEdit,
   IconUsers,
   IconNotebook,
-  IconTags
-
+  IconTags,
+  IconFileText,
+  IconWorld,
+  IconCompass,
+  IconFilePlus,
+  IconClock,
+  IconCheck,
 } from "@tabler/icons-react";
 
 import { uniqueId } from "lodash";
@@ -23,6 +27,22 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
+    title: "View site",
+    icon: IconWorld,
+    href: "/view-site",
+  },
+  {
+    id: uniqueId(),
+    title: "Explore",
+    icon: IconCompass,
+    href: "/explore",
+  },
+  {
+    navlabel: true,
+    subheader: "CONTENT",
+  },
+  {
+    id: uniqueId(),
     title: "Posts",
     icon: IconEdit,
     href: "/content/posts",
@@ -30,34 +50,38 @@ const Menuitems = [
   {
     id: uniqueId(),
     title: "Drafts",
-    icon: null,
+    icon: IconFilePlus,
     href: "/content/drafts",
   },
   {
     id: uniqueId(),
     title: "Scheduled",
-    icon: null,
+    icon: IconClock,
     href: "/content/scheduled",
   },
   {
     id: uniqueId(),
     title: "Published",
-    icon: null,
+    icon: IconCheck,
     href: "/content/published",
   },
-   {
+  {
+    navlabel: true,
+    subheader: "UTILS",
+  },
+  {
     id: uniqueId(),
     title: "Pages",
-    icon: IconNotebook,
+    icon: IconFileText,
     href: "/pages",
   },
-   {
+  {
     id: uniqueId(),
     title: "Tags",
     icon: IconTags,
     href: "/tags",
   },
-   {
+  {
     id: uniqueId(),
     title: "New Tags",
     icon: null,
