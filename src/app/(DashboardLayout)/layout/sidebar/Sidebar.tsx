@@ -24,7 +24,8 @@ const MSidebar = ({
       width: "7px",
     },
     "&::-webkit-scrollbar-thumb": {
-      backgroundColor: "#eff2f7",
+      backgroundColor: (theme: any) =>
+        theme.palette.mode === "dark" ? "#374151" : "#eff2f7",
       borderRadius: "15px",
     },
   };
@@ -75,11 +76,11 @@ const MSidebar = ({
             <Box
               sx={{
                 p: 2,
-                borderTop: "1px solid #f0f0f0",
+                borderTop: (theme) => `1px solid ${theme.palette.divider}`,
                 display: "flex",
                 alignItems: "center",
                 gap: 1.5,
-                background: "#fff",
+                background: (theme) => theme.palette.background.paper,
               }}
             >
               <Profile />

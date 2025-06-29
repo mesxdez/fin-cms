@@ -10,19 +10,29 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
+  Switch,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
 
 import { IconListCheck, IconMail, IconUser } from "@tabler/icons-react";
+import { useTheme } from "@/utils/ThemeContext";
 
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
+  const { mode, toggleTheme } = useTheme();
+
   const handleClick2 = (event: any) => {
     setAnchorEl2(event.currentTarget);
   };
   const handleClose2 = () => {
     setAnchorEl2(null);
+  };
+
+  const handleThemeToggle = () => {
+    toggleTheme();
+    handleClose2();
   };
 
   return (
@@ -87,11 +97,19 @@ const Profile = () => {
           </ListItemIcon>
           <ListItemText>Profile</ListItemText>
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={handleThemeToggle}>
           <ListItemIcon>
-            <DarkModeIcon width={20} />
+            {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
           </ListItemIcon>
-          <ListItemText>Dark Mode</ListItemText>
+          <ListItemText>
+            {mode === "dark" ? "Light Mode" : "Dark Mode"}
+          </ListItemText>
+          <Switch
+            checked={mode === "dark"}
+            onChange={handleThemeToggle}
+            size="small"
+            onClick={(e) => e.stopPropagation()}
+          />
         </MenuItem>
 
         <Box mt={1} py={1} px={2}>
