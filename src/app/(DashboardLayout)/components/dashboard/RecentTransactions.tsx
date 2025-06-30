@@ -16,7 +16,7 @@ const RecentTransactions = () => {
   const theme = useTheme();
 
   return (
-    <DashboardCard title="Recent Transactions">
+    <DashboardCard title="Recent Post">
       <>
         <Timeline
           className="theme-timeline"
