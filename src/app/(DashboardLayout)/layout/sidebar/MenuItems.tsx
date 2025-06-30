@@ -10,6 +10,7 @@ import {
   IconFilePlus,
   IconClock,
   IconCheck,
+  IconCategory,
 } from "@tabler/icons-react";
 
 import { uniqueId } from "lodash";
@@ -89,11 +90,23 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
+    title: "Category",
+    icon: IconCategory,
+    href: "/category",
+  },
+  {
+    id: uniqueId(),
+    title: "New Category",
+    icon: null,
+    href: "/category/new",
+  },
+  {
+    id: uniqueId(),
     title: "Members",
     icon: IconUsers,
     href: "/members",
   },
-   {
+  {
     id: uniqueId(),
     title: "New Member",
     icon: null,
