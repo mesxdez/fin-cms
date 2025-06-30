@@ -47,9 +47,10 @@ export default function RootLayout({
         {/* PageContent */}
         {/* ------------------------------------------- */}
         <Container
+          maxWidth={false}
           sx={{
             paddingTop: "20px",
-            maxWidth: "1200px",
+            width: "100%",
           }}
         >
           {/* ------------------------------------------- */}

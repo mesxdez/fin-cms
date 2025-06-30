@@ -101,7 +101,7 @@ const SalesOverview = () => {
 
   return (
     <DashboardCard
-      title="Sales Overview"
+      title="Post Overview"
       action={
         <Select
           labelId="month-dd"
