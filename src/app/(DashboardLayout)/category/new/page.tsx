@@ -16,7 +16,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
 
-export default function NewTagPage() {
+export default function NewCategoryPage() {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [color, setColor] = useState("#15171A");
@@ -28,8 +28,8 @@ export default function NewTagPage() {
   const [xDesc, setXDesc] = useState("");
   const [fbTitle, setFbTitle] = useState("");
   const [fbDesc, setFbDesc] = useState("");
-  const [tagHeader, setTagHeader] = useState("");
-  const [tagFooter, setTagFooter] = useState("");
+  const [categoryHeader, setCategoryHeader] = useState("");
+  const [categoryFooter, setCategoryFooter] = useState("");
 
   return (
     <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
@@ -41,7 +41,7 @@ export default function NewTagPage() {
           mb={3}
         >
           <Typography variant="h5" fontWeight="bold">
-            New tag
+            New Category
           </Typography>
         </Box>
 
@@ -56,7 +56,7 @@ export default function NewTagPage() {
                 setName(e.target.value);
                 setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"));
               }}
-              helperText="Start with # to create internal tags"
+              helperText="Start with # to create internal Category"
             />
             <Box>
               <InputLabel shrink>Color</InputLabel>
@@ -74,7 +74,7 @@ export default function NewTagPage() {
             fullWidth
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
-            helperText="https://your-site.com/tag/[slug]"
+            helperText="https://your-site.com/category/[slug]"
           />
 
           <TextField
@@ -189,20 +189,20 @@ export default function NewTagPage() {
           <AccordionDetails>
             <Stack spacing={2}>
               <TextField
-                label="Tag header"
+                label="Category header"
                 fullWidth
                 multiline
                 minRows={3}
-                value={tagHeader}
-                onChange={(e) => setTagHeader(e.target.value)}
+                value={categoryHeader}
+                onChange={(e) => setCategoryHeader(e.target.value)}
               />
               <TextField
-                label="Tag footer"
+                label="Category footer"
                 fullWidth
                 multiline
                 minRows={3}
-                value={tagFooter}
-                onChange={(e) => setTagFooter(e.target.value)}
+                value={categoryFooter}
+                onChange={(e) => setCategoryFooter(e.target.value)}
               />
             </Stack>
           </AccordionDetails>
