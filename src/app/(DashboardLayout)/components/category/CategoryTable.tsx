@@ -1,59 +1,58 @@
 "use client";
+import { useEffect, useState } from "react";
+import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from "@mui/material";
 
-import {
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Typography,
-  Box,
-} from "@mui/material";
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  color: string;
+}
 
-const Category = [
-  {
-    name: "Trading",
-    description: "Content about trading strategies and tips",
-    slug: "trading",
-    postCount: 12,
-    created: "10 Jun 2025",
-  },
-  {
-    name: "Crypto",
-    description: "News and updates on cryptocurrencies",
-    slug: "crypto",
-    postCount: 8,
-    created: "14 Jun 2025",
-  },
-];
+export default function CategoryTable() {
+  const [categories, setCategories] = useState<Category[]>([]);
 
-const CategoryTable = () => (
-  <Box sx={{ border: "1px solid #eee", borderRadius: 2, overflow: "hidden" }}>
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>Name</TableCell>
-          <TableCell>Description</TableCell>
-          <TableCell>Slug</TableCell>
-          <TableCell>Posts</TableCell>
-          <TableCell>Created</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {Category.map((Category, index) => (
-          <TableRow key={index}>
-            <TableCell>
-              <Typography fontWeight={500}>{Category.name}</Typography>
-            </TableCell>
-            <TableCell>{Category.description}</TableCell>
-            <TableCell>{Category.slug}</TableCell>
-            <TableCell>{Category.postCount}</TableCell>
-            <TableCell>{Category.created}</TableCell>
+  useEffect(() => {
+    async function fetchCategories() {
+      const res = await fetch("/api/categories");
+      const data = await res.json();
+      setCategories(data);
+    }
+
+    fetchCategories();
+  }, []);
+
+  return (
+    <Paper>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell>Slug</TableCell>
+            <TableCell>Color</TableCell>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </Box>
-);
-
-export default CategoryTable;
+        </TableHead>
+        <TableBody>
+          {categories.map((category) => (
+            <TableRow key={category.id}>
+              <TableCell>{category.name}</TableCell>
+              <TableCell>{category.slug}</TableCell>
+              <TableCell>
+                <span
+                  style={{
+                    display: "inline-block",
+                    backgroundColor: category.color,
+                    width: 16,
+                    height: 16,
+                    borderRadius: "50%",
+                  }}
+                ></span>{" "}
+                {category.color}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Paper>
+  );
+}

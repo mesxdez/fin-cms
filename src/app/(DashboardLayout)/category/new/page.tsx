@@ -31,15 +31,47 @@ export default function NewCategoryPage() {
   const [categoryHeader, setCategoryHeader] = useState("");
   const [categoryFooter, setCategoryFooter] = useState("");
 
+  const handleSave = async () => {
+    const payload = {
+      name,
+      slug,
+      color,
+      description,
+      metaTitle,
+      metaDesc,
+      canonicalUrl,
+      xTitle,
+      xDesc,
+      fbTitle,
+      fbDesc,
+      categoryHeader,
+      categoryFooter,
+    };
+
+    try {
+      const res = await fetch("/api/categories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("Failed to save");
+
+      const result = await res.json();
+      console.log("✅ Category saved:", result);
+      alert("Category saved successfully!");
+    } catch (err) {
+      console.error("❌ Error saving category:", err);
+      alert("Failed to save category");
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
       <Stack spacing={3} alignItems="center">
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={3}
-        >
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Typography variant="h5" fontWeight="bold">
             New Category
           </Typography>
@@ -53,8 +85,9 @@ export default function NewCategoryPage() {
               fullWidth
               value={name}
               onChange={(e) => {
-                setName(e.target.value);
-                setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"));
+                const value = e.target.value;
+                setName(value);
+                setSlug(value.toLowerCase().replace(/\s+/g, "-"));
               }}
               helperText="Start with # to create internal Category"
             />
@@ -207,10 +240,12 @@ export default function NewCategoryPage() {
             </Stack>
           </AccordionDetails>
         </Accordion>
+
         <Button
           variant="contained"
           color="primary"
           sx={{ mt: 4, width: "100%", maxWidth: 500 }}
+          onClick={handleSave}
         >
           Save
         </Button>
