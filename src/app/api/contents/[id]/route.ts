@@ -30,11 +30,12 @@ const contents: any[] = globalAny.contents;
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = parseInt(params.id, 10);
+  const { id } = await params;
+  const contentId = parseInt(id, 10);
   const content = contents.find(
-    (c: any) => c.id === id && c.status === "Published"
+    (c: any) => c.id === contentId && c.status === "Published"
   );
   if (!content) {
     return NextResponse.json({ message: "Not found" }, { status: 404 });

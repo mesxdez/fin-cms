@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface Content {
   id: number;
@@ -38,7 +38,7 @@ export const useContent = (options: UseContentOptions = {}) => {
     totalPages: 0,
   });
 
-  const fetchContents = async () => {
+  const fetchContents = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -68,11 +68,11 @@ export const useContent = (options: UseContentOptions = {}) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [options.status, options.search, options.page, options.limit]);
 
   useEffect(() => {
     fetchContents();
-  }, [options.status, options.search, options.page, options.limit]);
+  }, [fetchContents]);
 
   const refetch = () => {
     fetchContents();
