@@ -1,54 +1,74 @@
 'use client';
-
+import { useEffect, useState } from 'react';
 import {
-  Table, TableHead, TableRow, TableCell, TableBody,
-  Typography, Box
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Typography, Chip
 } from '@mui/material';
 
-const tags = [
-  {
-    name: 'Trading',
-    description: 'Content about trading strategies and tips',
-    slug : 'trading',
-    postCount: 12,
-    created: '10 Jun 2025',
-  },
-  {
-    name: 'Crypto',
-    description: 'News and updates on cryptocurrencies',
-    slug : 'crypto',
-    postCount: 8,
-    created: '14 Jun 2025',
-  },
-];
+interface Tag {
+  id: string;
+  name: string;
+  slug: string;
+  color: string;
+  description?: string;
+}
 
-const TagTable = () => (
-  <Box sx={{ border: '1px solid #eee', borderRadius: 2, overflow: 'hidden' }}>
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>Name</TableCell>
-          <TableCell>Description</TableCell>
-          <TableCell>Slug</TableCell>
-          <TableCell>Posts</TableCell>
-          <TableCell>Created</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {tags.map((tag, index) => (
-          <TableRow key={index}>
-            <TableCell>
-              <Typography fontWeight={500}>{tag.name}</Typography>
-            </TableCell>
-            <TableCell>{tag.description}</TableCell>
-            <TableCell>{tag.slug}</TableCell>
-            <TableCell>{tag.postCount}</TableCell>
-            <TableCell>{tag.created}</TableCell>
+const TagTable = () => {
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const res = await fetch('/api/tags');
+        const data = await res.json();
+        setTags(data);
+      } catch (err) {
+        console.error('❌ Failed to fetch tags:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTags();
+  }, []);
+
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  return (
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell><strong>Name</strong></TableCell>
+            <TableCell><strong>Slug</strong></TableCell>
+            <TableCell><strong>Color</strong></TableCell>
+            <TableCell><strong>Description</strong></TableCell>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </Box>
-);
+        </TableHead>
+        <TableBody>
+          {tags.map((tag) => (
+            <TableRow key={tag.id}>
+              <TableCell>{tag.name}</TableCell>
+              <TableCell>{tag.slug}</TableCell>
+              <TableCell>
+                <Chip
+                  label={tag.color}
+                  style={{
+                    backgroundColor: tag.color,
+                    color: '#fff'
+                  }}
+                />
+              </TableCell>
+              <TableCell>{tag.description || '-'}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
 
 export default TagTable;

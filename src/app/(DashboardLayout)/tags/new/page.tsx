@@ -31,18 +31,53 @@ export default function NewTagPage() {
   const [tagHeader, setTagHeader] = useState("");
   const [tagFooter, setTagFooter] = useState("");
 
+  const handleSave = async () => {
+    const payload = {
+      name,
+      slug,
+      color,
+      description,
+      metaTitle,
+      metaDesc,
+      canonicalUrl,
+      xTitle,
+      xDesc,
+      fbTitle,
+      fbDesc,
+      tagHeader,
+      tagFooter
+    };
+
+    try {
+      const res = await fetch("/api/tags", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error("Failed to save tag");
+
+      const result = await res.json();
+      console.log("✅ Tag created:", result);
+      alert("Tag saved successfully!");
+      // Reset form (optional)
+      setName(""); setSlug(""); setColor("#15171A"); setDescription("");
+      setMetaTitle(""); setMetaDesc(""); setCanonicalUrl("");
+      setXTitle(""); setXDesc(""); setFbTitle(""); setFbDesc("");
+      setTagHeader(""); setTagFooter("");
+    } catch (err) {
+      console.error("❌ Error saving tag:", err);
+      alert("Failed to save tag. Please try again.");
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
       <Stack spacing={3} alignItems="center">
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={3}
-        >
-          <Typography variant="h5" fontWeight="bold">
-            New tag
-          </Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <Typography variant="h5" fontWeight="bold">New tag</Typography>
         </Box>
 
         {/* Main Fields */}
@@ -53,8 +88,9 @@ export default function NewTagPage() {
               fullWidth
               value={name}
               onChange={(e) => {
-                setName(e.target.value);
-                setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"));
+                const value = e.target.value;
+                setName(value);
+                setSlug(value.toLowerCase().replace(/\s+/g, "-"));
               }}
               helperText="Start with # to create internal tags"
             />
@@ -88,7 +124,7 @@ export default function NewTagPage() {
           />
         </Stack>
 
-        {/* Meta Data Accordion */}
+        {/* Meta Data */}
         <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography fontWeight="bold">Meta data</Typography>
@@ -100,7 +136,6 @@ export default function NewTagPage() {
                 fullWidth
                 value={metaTitle}
                 onChange={(e) => setMetaTitle(e.target.value)}
-                helperText="Recommended: 70 characters"
               />
               <TextField
                 label="Meta description"
@@ -109,7 +144,6 @@ export default function NewTagPage() {
                 rows={2}
                 value={metaDesc}
                 onChange={(e) => setMetaDesc(e.target.value)}
-                helperText="Recommended: 156 characters"
               />
               <TextField
                 label="Canonical URL"
@@ -121,7 +155,7 @@ export default function NewTagPage() {
           </AccordionDetails>
         </Accordion>
 
-        {/* X Card Accordion */}
+        {/* X Card */}
         <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography fontWeight="bold">X card</Typography>
@@ -136,7 +170,6 @@ export default function NewTagPage() {
                 fullWidth
                 value={xTitle}
                 onChange={(e) => setXTitle(e.target.value)}
-                helperText="Recommended: 70 characters"
               />
               <TextField
                 label="X description"
@@ -145,13 +178,12 @@ export default function NewTagPage() {
                 rows={2}
                 value={xDesc}
                 onChange={(e) => setXDesc(e.target.value)}
-                helperText="Recommended: 125 characters"
               />
             </Stack>
           </AccordionDetails>
         </Accordion>
 
-        {/* Facebook Card Accordion */}
+        {/* Facebook Card */}
         <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography fontWeight="bold">Facebook card</Typography>
@@ -166,7 +198,6 @@ export default function NewTagPage() {
                 fullWidth
                 value={fbTitle}
                 onChange={(e) => setFbTitle(e.target.value)}
-                helperText="Recommended: 100 characters"
               />
               <TextField
                 label="Facebook description"
@@ -175,13 +206,12 @@ export default function NewTagPage() {
                 rows={2}
                 value={fbDesc}
                 onChange={(e) => setFbDesc(e.target.value)}
-                helperText="Recommended: 65 characters"
               />
             </Stack>
           </AccordionDetails>
         </Accordion>
 
-        {/* Code Injection Accordion */}
+        {/* Code Injection */}
         <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography fontWeight="bold">Code injection</Typography>
@@ -207,10 +237,13 @@ export default function NewTagPage() {
             </Stack>
           </AccordionDetails>
         </Accordion>
+
+        {/* Save Button */}
         <Button
           variant="contained"
           color="primary"
           sx={{ mt: 4, width: "100%", maxWidth: 500 }}
+          onClick={handleSave}
         >
           Save
         </Button>
