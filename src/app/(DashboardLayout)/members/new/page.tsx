@@ -21,18 +21,33 @@ export default function NewMemberPage() {
   const [note, setNote] = useState('');
   const [newsletter, setNewsletter] = useState(true);
 
+  const handleSave = async () => {
+    const res = await fetch('/api/members', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, labels, note, newsletter })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      alert('✅ Member created: ' + data.name);
+      // Reset หรือ redirect ได้ตามต้องการ
+    } else {
+      alert('❌ Failed to create member');
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
       {/* Save Button */}
       <Box display="flex" justifyContent="flex-end" mb={3}>
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary" onClick={handleSave}>
           Save
         </Button>
       </Box>
 
       {/* Header: Avatar + Form */}
       <Box display="flex" gap={4} alignItems="flex-start" mb={4}>
-        {/* Avatar Section */}
         <Box display="flex" flexDirection="column" alignItems="center">
           <Avatar sx={{ width: 80, height: 80, fontSize: 32 }}>
             {name ? name[0].toUpperCase() : 'N'}
@@ -40,7 +55,6 @@ export default function NewMemberPage() {
           <Typography mt={1} fontWeight="medium">New member</Typography>
         </Box>
 
-        {/* Form */}
         <Paper variant="outlined" sx={{ flexGrow: 1, p: 3, borderRadius: 2 }}>
           <Stack spacing={3}>
             <Box display="flex" gap={2}>
@@ -80,18 +94,12 @@ export default function NewMemberPage() {
         </Paper>
       </Box>
 
-      {/* Extra Sections: Newsletter + Activity */}
+      {/* Extra Sections */}
       <Box sx={{ maxWidth: 800, ml: 'auto', mr: 'auto' }}>
-        {/* Newsletter Section */}
-        <Paper
-          variant="outlined"
-          sx={{ p: 3, mb: 4, borderRadius: 2, bgcolor: 'background.paper' }}
-        >
-          <Typography fontWeight="bold" mb={2}>
-            NEWSLETTERS
-          </Typography>
+        <Paper variant="outlined" sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+          <Typography fontWeight="bold" mb={2}>NEWSLETTERS</Typography>
           <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography fontWeight="medium">test</Typography>
+            <Typography fontWeight="medium">Receive newsletter?</Typography>
             <FormControlLabel
               control={
                 <Switch
@@ -103,18 +111,15 @@ export default function NewMemberPage() {
             />
           </Box>
           <Typography variant="body2" color="text.secondary" mt={1}>
-            If disabled, member will <strong>not</strong> receive newsletter emails
+            If disabled, member will <strong>not</strong> receive newsletter emails.
           </Typography>
         </Paper>
 
-        {/* Activity Section */}
         <Paper
           variant="outlined"
-          sx={{ p: 4, textAlign: 'center', borderRadius: 2, bgcolor: 'background.paper' }}
+          sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}
         >
-          <Typography fontWeight="bold" mb={2}>
-            ACTIVITY
-          </Typography>
+          <Typography fontWeight="bold" mb={2}>ACTIVITY</Typography>
           <Typography variant="h6" color="text.secondary" gutterBottom>
             Activity
           </Typography>
