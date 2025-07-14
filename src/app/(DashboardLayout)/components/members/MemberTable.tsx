@@ -10,6 +10,7 @@ type Member = {
   id: string;
   name: string;
   email: string;
+  role?: string;
   status?: string;
   openRate?: string;
   location?: string;
@@ -35,6 +36,7 @@ const MemberTable = () => {
           <TableRow>
             <TableCell></TableCell>
             <TableCell>Name</TableCell>
+            <TableCell>Role</TableCell>
             <TableCell>Status</TableCell>
             <TableCell>Open Rate</TableCell>
             <TableCell>Location</TableCell>
@@ -49,6 +51,7 @@ const MemberTable = () => {
                 <Typography fontWeight={500}>{m.name}</Typography>
                 <Typography variant="body2" color="text.secondary">{m.email}</Typography>
               </TableCell>
+              <TableCell>{m.role ?? 'Member'}</TableCell>
               <TableCell>{m.status ?? 'Free'}</TableCell>
               <TableCell>{m.openRate ?? 'N/A'}</TableCell>
               <TableCell>{m.location ?? 'Unknown'}</TableCell>

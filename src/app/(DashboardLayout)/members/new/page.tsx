@@ -15,6 +15,7 @@ import {
   Switch,
   TextField,
   Typography,
+  MenuItem
 } from '@mui/material';
 import { useState } from 'react';
 
@@ -24,18 +25,18 @@ export default function NewMemberPage() {
   const [labels, setLabels] = useState('');
   const [note, setNote] = useState('');
   const [newsletter, setNewsletter] = useState(true);
-  const [openModal, setOpenModal] = useState(false); // ✅ Modal state
+  const [role, setRole] = useState('Member'); // ✅ Default role
+  const [openModal, setOpenModal] = useState(false);
 
   const handleSave = async () => {
     const res = await fetch('/api/members', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, labels, note, newsletter })
+      body: JSON.stringify({ name, email, labels, note, newsletter, role })
     });
 
     if (res.ok) {
-      setOpenModal(true); // ✅ Show modal
-      // หรือจะ reset form ตรงนี้ก็ได้
+      setOpenModal(true);
     } else {
       alert('❌ Failed to create member');
     }
@@ -43,12 +44,10 @@ export default function NewMemberPage() {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    // สามารถ redirect ได้ตรงนี้ถ้าต้องการ
   };
 
   return (
     <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
-      {/* ✅ Success Modal */}
       <Dialog open={openModal} onClose={handleCloseModal}>
         <DialogTitle>✅ Member Created</DialogTitle>
         <DialogContent>
@@ -61,14 +60,12 @@ export default function NewMemberPage() {
         </DialogActions>
       </Dialog>
 
-      {/* Save Button */}
       <Box display="flex" justifyContent="flex-end" mb={3}>
         <Button variant="contained" color="primary" onClick={handleSave}>
           Save
         </Button>
       </Box>
 
-      {/* Header: Avatar + Form */}
       <Box display="flex" gap={4} alignItems="flex-start" mb={4}>
         <Box display="flex" flexDirection="column" alignItems="center">
           <Avatar sx={{ width: 80, height: 80, fontSize: 32 }}>
@@ -96,6 +93,18 @@ export default function NewMemberPage() {
             </Box>
 
             <TextField
+              select
+              label="Role"
+              fullWidth
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <MenuItem value="Member">Member</MenuItem>
+              <MenuItem value="Admin">Admin</MenuItem>
+              <MenuItem value="Editor">Editor</MenuItem>
+            </TextField>
+
+            <TextField
               label="Labels"
               fullWidth
               value={labels}
@@ -116,7 +125,6 @@ export default function NewMemberPage() {
         </Paper>
       </Box>
 
-      {/* Extra Sections */}
       <Box sx={{ maxWidth: 800, ml: 'auto', mr: 'auto' }}>
         <Paper variant="outlined" sx={{ p: 3, mb: 4, borderRadius: 2 }}>
           <Typography fontWeight="bold" mb={2}>NEWSLETTERS</Typography>
