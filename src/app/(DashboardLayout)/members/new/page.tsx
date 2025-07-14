@@ -5,6 +5,10 @@ import {
   Box,
   Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControlLabel,
   Paper,
   Stack,
@@ -20,6 +24,7 @@ export default function NewMemberPage() {
   const [labels, setLabels] = useState('');
   const [note, setNote] = useState('');
   const [newsletter, setNewsletter] = useState(true);
+  const [openModal, setOpenModal] = useState(false); // ✅ Modal state
 
   const handleSave = async () => {
     const res = await fetch('/api/members', {
@@ -29,16 +34,33 @@ export default function NewMemberPage() {
     });
 
     if (res.ok) {
-      const data = await res.json();
-      alert('✅ Member created: ' + data.name);
-      // Reset หรือ redirect ได้ตามต้องการ
+      setOpenModal(true); // ✅ Show modal
+      // หรือจะ reset form ตรงนี้ก็ได้
     } else {
       alert('❌ Failed to create member');
     }
   };
 
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    // สามารถ redirect ได้ตรงนี้ถ้าต้องการ
+  };
+
   return (
     <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
+      {/* ✅ Success Modal */}
+      <Dialog open={openModal} onClose={handleCloseModal}>
+        <DialogTitle>✅ Member Created</DialogTitle>
+        <DialogContent>
+          <Typography>Member <strong>{name}</strong> has been successfully created.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Save Button */}
       <Box display="flex" justifyContent="flex-end" mb={3}>
         <Button variant="contained" color="primary" onClick={handleSave}>
