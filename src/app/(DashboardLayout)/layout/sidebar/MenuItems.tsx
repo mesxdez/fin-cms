@@ -11,6 +11,10 @@ import {
   IconClock,
   IconCheck,
   IconCategory,
+  IconUserPlus,
+  IconCategoryPlus,
+  IconTagPlus
+
 } from "@tabler/icons-react";
 
 import { uniqueId } from "lodash";
@@ -85,7 +89,7 @@ const Menuitems = [
   {
     id: uniqueId(),
     title: "New Tags",
-    icon: null,
+    icon: IconTagPlus,
     href: "/tags/new",
   },
   {
@@ -97,7 +101,7 @@ const Menuitems = [
   {
     id: uniqueId(),
     title: "New Category",
-    icon: null,
+    icon: IconCategoryPlus,
     href: "/category/new",
   },
   {
@@ -109,7 +113,7 @@ const Menuitems = [
   {
     id: uniqueId(),
     title: "New Member",
-    icon: null,
+    icon: IconUserPlus,
     href: "/members/new",
   },
 ];

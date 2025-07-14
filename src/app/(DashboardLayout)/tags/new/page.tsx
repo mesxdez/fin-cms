@@ -7,6 +7,10 @@ import {
   Box,
   Button,
   Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   InputLabel,
   OutlinedInput,
   Stack,
@@ -31,6 +35,9 @@ export default function NewTagPage() {
   const [tagHeader, setTagHeader] = useState("");
   const [tagFooter, setTagFooter] = useState("");
 
+  // ✅ Modal state
+  const [openModal, setOpenModal] = useState(false);
+
   const handleSave = async () => {
     const payload = {
       name,
@@ -45,28 +52,38 @@ export default function NewTagPage() {
       fbTitle,
       fbDesc,
       tagHeader,
-      tagFooter
+      tagFooter,
     };
 
     try {
       const res = await fetch("/api/tags", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error("Failed to save tag");
 
       const result = await res.json();
       console.log("✅ Tag created:", result);
-      alert("Tag saved successfully!");
-      // Reset form (optional)
-      setName(""); setSlug(""); setColor("#15171A"); setDescription("");
-      setMetaTitle(""); setMetaDesc(""); setCanonicalUrl("");
-      setXTitle(""); setXDesc(""); setFbTitle(""); setFbDesc("");
-      setTagHeader(""); setTagFooter("");
+      setOpenModal(true); // ✅ Show modal
+
+      // Reset form
+      setName("");
+      setSlug("");
+      setColor("#15171A");
+      setDescription("");
+      setMetaTitle("");
+      setMetaDesc("");
+      setCanonicalUrl("");
+      setXTitle("");
+      setXDesc("");
+      setFbTitle("");
+      setFbDesc("");
+      setTagHeader("");
+      setTagFooter("");
     } catch (err) {
       console.error("❌ Error saving tag:", err);
       alert("Failed to save tag. Please try again.");
@@ -75,6 +92,21 @@ export default function NewTagPage() {
 
   return (
     <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
+      {/* ✅ Modal */}
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+        <DialogTitle>🎉 Tag Created Successfully</DialogTitle>
+        <DialogContent>
+          <Typography>
+            The tag "<strong>{name}</strong>" has been saved successfully.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenModal(false)} autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Stack spacing={3} alignItems="center">
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Typography variant="h5" fontWeight="bold">New tag</Typography>

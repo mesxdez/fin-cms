@@ -7,6 +7,10 @@ import {
   Box,
   Button,
   Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   InputLabel,
   OutlinedInput,
   Stack,
@@ -30,6 +34,7 @@ export default function NewCategoryPage() {
   const [fbDesc, setFbDesc] = useState("");
   const [categoryHeader, setCategoryHeader] = useState("");
   const [categoryFooter, setCategoryFooter] = useState("");
+  const [openModal, setOpenModal] = useState(false); // ✅ Modal state
 
   const handleSave = async () => {
     const payload = {
@@ -61,7 +66,7 @@ export default function NewCategoryPage() {
 
       const result = await res.json();
       console.log("✅ Category saved:", result);
-      alert("Category saved successfully!");
+      setOpenModal(true); // ✅ Show modal
     } catch (err) {
       console.error("❌ Error saving category:", err);
       alert("Failed to save category");
@@ -70,6 +75,21 @@ export default function NewCategoryPage() {
 
   return (
     <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
+      {/* ✅ Modal Success */}
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+        <DialogTitle>🎉 Category Saved Successfully</DialogTitle>
+        <DialogContent>
+          <Typography>
+            The category "<strong>{name}</strong>" has been saved successfully.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenModal(false)} autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Stack spacing={3} alignItems="center">
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Typography variant="h5" fontWeight="bold">
