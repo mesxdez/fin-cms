@@ -1,87 +1,189 @@
 "use client";
 
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Button,
   Container,
+  Stack,
+  TextField,
+  Button,
+  Typography,
+  Box,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  InputLabel,
-  OutlinedInput,
-  Stack,
-  TextField,
-  Typography,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
 
 export default function NewCategoryPage() {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
-  const [color, setColor] = useState("#15171A");
+  const [color, setColor] = useState("#1976d2");
   const [description, setDescription] = useState("");
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDesc, setMetaDesc] = useState("");
   const [canonicalUrl, setCanonicalUrl] = useState("");
-  const [xTitle, setXTitle] = useState("");
-  const [xDesc, setXDesc] = useState("");
-  const [fbTitle, setFbTitle] = useState("");
-  const [fbDesc, setFbDesc] = useState("");
-  const [categoryHeader, setCategoryHeader] = useState("");
-  const [categoryFooter, setCategoryFooter] = useState("");
-  const [openModal, setOpenModal] = useState(false); // ✅ Modal state
+  const [header, setHeader] = useState("");
+  const [footer, setFooter] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = async () => {
-    const payload = {
-      name,
-      slug,
-      color,
-      description,
-      metaTitle,
-      metaDesc,
-      canonicalUrl,
-      xTitle,
-      xDesc,
-      fbTitle,
-      fbDesc,
-      categoryHeader,
-      categoryFooter,
-    };
+    setLoading(true);
+    setError(null);
 
     try {
+      const payload = {
+        name,
+        slug,
+        color,
+        description,
+        metaTitle,
+        metaDesc,
+        canonicalUrl,
+        header,
+        footer,
+      };
+
       const res = await fetch("/api/categories", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to save");
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error || "Failed to save category");
+      }
 
-      const result = await res.json();
-      console.log("✅ Category saved:", result);
-      setOpenModal(true); // ✅ Show modal
-    } catch (err) {
-      console.error("❌ Error saving category:", err);
-      alert("Failed to save category");
+      setOpenModal(true);
+      setName("");
+      setSlug("");
+      setColor("#1976d2");
+      setDescription("");
+      setMetaTitle("");
+      setMetaDesc("");
+      setCanonicalUrl("");
+      setHeader("");
+      setFooter("");
+    } catch (err: any) {
+      setError(err.message || "Unknown error");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const onNameChange = (val: string) => {
+    setName(val);
+    setSlug(val.toLowerCase().trim().replace(/\s+/g, "-"));
+  };
+
   return (
-    <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
-      {/* ✅ Modal Success */}
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>🎉 Category Saved Successfully</DialogTitle>
-        <DialogContent>
-          <Typography>
-            The category "<strong>{name}</strong>" has been saved successfully.
+    <Container maxWidth="sm" sx={{ py: 4 }}>
+      <Typography variant="h5" fontWeight="bold" mb={3}>
+        Create New Category
+      </Typography>
+
+      <Stack spacing={3}>
+        <TextField
+          label="Name"
+          value={name}
+          onChange={(e) => onNameChange(e.target.value)}
+          fullWidth
+          required
+        />
+
+        <TextField
+          label="Slug"
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          fullWidth
+          required
+        />
+
+        <Box>
+          <Typography>Color</Typography>
+          <input
+            type="color"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            style={{ width: 50, height: 40, border: "none", cursor: "pointer" }}
+          />
+        </Box>
+
+        <TextField
+          label="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          multiline
+          rows={3}
+          fullWidth
+        />
+
+        <TextField
+          label="Meta Title"
+          value={metaTitle}
+          onChange={(e) => setMetaTitle(e.target.value)}
+          fullWidth
+        />
+
+        <TextField
+          label="Meta Description"
+          value={metaDesc}
+          onChange={(e) => setMetaDesc(e.target.value)}
+          multiline
+          rows={2}
+          fullWidth
+        />
+
+        <TextField
+          label="Canonical URL"
+          value={canonicalUrl}
+          onChange={(e) => setCanonicalUrl(e.target.value)}
+          fullWidth
+        />
+
+        <TextField
+          label="Header (Code Injection)"
+          value={header}
+          onChange={(e) => setHeader(e.target.value)}
+          multiline
+          rows={3}
+          fullWidth
+        />
+
+        <TextField
+          label="Footer (Code Injection)"
+          value={footer}
+          onChange={(e) => setFooter(e.target.value)}
+          multiline
+          rows={3}
+          fullWidth
+        />
+
+        {error && (
+          <Typography color="error" variant="body2">
+            {error}
           </Typography>
+        )}
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSave}
+          disabled={loading}
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          {loading ? "Saving..." : "Save"}
+        </Button>
+      </Stack>
+
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+        <DialogTitle>🎉 Category Created</DialogTitle>
+        <DialogContent>
+          <Typography>The category "{name}" has been saved.</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)} autoFocus>
@@ -89,187 +191,6 @@ export default function NewCategoryPage() {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Stack spacing={3} alignItems="center">
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h5" fontWeight="bold">
-            New Category
-          </Typography>
-        </Box>
-
-        {/* Main Fields */}
-        <Stack spacing={3} sx={{ width: "100%", maxWidth: 500 }}>
-          <Box display="flex" gap={2}>
-            <TextField
-              label="Name"
-              fullWidth
-              value={name}
-              onChange={(e) => {
-                const value = e.target.value;
-                setName(value);
-                setSlug(value.toLowerCase().replace(/\s+/g, "-"));
-              }}
-              helperText="Start with # to create internal Category"
-            />
-            <Box>
-              <InputLabel shrink>Color</InputLabel>
-              <OutlinedInput
-                type="color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                sx={{ width: 64, height: 56, padding: 0 }}
-              />
-            </Box>
-          </Box>
-
-          <TextField
-            label="Slug"
-            fullWidth
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            helperText="https://your-site.com/category/[slug]"
-          />
-
-          <TextField
-            label="Description"
-            fullWidth
-            multiline
-            rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            helperText="Maximum: 500 characters"
-          />
-        </Stack>
-
-        {/* Meta Data Accordion */}
-        <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography fontWeight="bold">Meta data</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Stack spacing={2}>
-              <TextField
-                label="Meta title"
-                fullWidth
-                value={metaTitle}
-                onChange={(e) => setMetaTitle(e.target.value)}
-                helperText="Recommended: 70 characters"
-              />
-              <TextField
-                label="Meta description"
-                fullWidth
-                multiline
-                rows={2}
-                value={metaDesc}
-                onChange={(e) => setMetaDesc(e.target.value)}
-                helperText="Recommended: 156 characters"
-              />
-              <TextField
-                label="Canonical URL"
-                fullWidth
-                value={canonicalUrl}
-                onChange={(e) => setCanonicalUrl(e.target.value)}
-              />
-            </Stack>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* X Card Accordion */}
-        <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography fontWeight="bold">X card</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Stack spacing={2}>
-              <Button variant="outlined" fullWidth>
-                Add X image
-              </Button>
-              <TextField
-                label="X title"
-                fullWidth
-                value={xTitle}
-                onChange={(e) => setXTitle(e.target.value)}
-                helperText="Recommended: 70 characters"
-              />
-              <TextField
-                label="X description"
-                fullWidth
-                multiline
-                rows={2}
-                value={xDesc}
-                onChange={(e) => setXDesc(e.target.value)}
-                helperText="Recommended: 125 characters"
-              />
-            </Stack>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Facebook Card Accordion */}
-        <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography fontWeight="bold">Facebook card</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Stack spacing={2}>
-              <Button variant="outlined" fullWidth>
-                Add Facebook image
-              </Button>
-              <TextField
-                label="Facebook title"
-                fullWidth
-                value={fbTitle}
-                onChange={(e) => setFbTitle(e.target.value)}
-                helperText="Recommended: 100 characters"
-              />
-              <TextField
-                label="Facebook description"
-                fullWidth
-                multiline
-                rows={2}
-                value={fbDesc}
-                onChange={(e) => setFbDesc(e.target.value)}
-                helperText="Recommended: 65 characters"
-              />
-            </Stack>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Code Injection Accordion */}
-        <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography fontWeight="bold">Code injection</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Stack spacing={2}>
-              <TextField
-                label="Category header"
-                fullWidth
-                multiline
-                minRows={3}
-                value={categoryHeader}
-                onChange={(e) => setCategoryHeader(e.target.value)}
-              />
-              <TextField
-                label="Category footer"
-                fullWidth
-                multiline
-                minRows={3}
-                value={categoryFooter}
-                onChange={(e) => setCategoryFooter(e.target.value)}
-              />
-            </Stack>
-          </AccordionDetails>
-        </Accordion>
-
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ mt: 4, width: "100%", maxWidth: 500 }}
-          onClick={handleSave}
-        >
-          Save
-        </Button>
-      </Stack>
     </Container>
   );
 }

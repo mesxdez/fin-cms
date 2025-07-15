@@ -1,9 +1,7 @@
-"use client";
-
+import { Container, Stack, Typography, Button } from "@mui/material";
 import Link from "next/link";
-import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import CategoryTable from "../components/category/CategoryTable";
-import CategoryCard from "../components/category/CategoryCard";
+
 
 const CategoryPage = () => {
   return (
@@ -15,7 +13,7 @@ const CategoryPage = () => {
         mb={3}
       >
         <Typography variant="h4" fontWeight="bold">
-          Category
+          Categories
         </Typography>
         <Button
           component={Link}
