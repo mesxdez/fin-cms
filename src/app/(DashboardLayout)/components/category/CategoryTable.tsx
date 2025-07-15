@@ -1,58 +1,89 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from "@mui/material";
+import {
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Typography, Chip
+} from "@mui/material";
 
 interface Category {
   id: string;
   name: string;
   slug: string;
   color: string;
+  description?: string;
 }
 
-export default function CategoryTable() {
+const CategoryTable = () => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchCategories() {
-      const res = await fetch("/api/categories");
-      const data = await res.json();
-      setCategories(data);
-    }
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/categories");
+        if (!res.ok) throw new Error(`Failed to fetch categories: ${res.statusText}`);
+        const json = await res.json();
+
+        if (!Array.isArray(json.data)) {
+          throw new Error("Unexpected API response format");
+        }
+
+        setCategories(json.data);
+      } catch (err: any) {
+        setError(err.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchCategories();
   }, []);
 
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (error) {
+    return <Typography color="error">Error: {error}</Typography>;
+  }
+
+  if (categories.length === 0) {
+    return <Typography>No categories found.</Typography>;
+  }
+
   return (
-    <Paper>
+    <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Slug</TableCell>
-            <TableCell>Color</TableCell>
+            <TableCell><strong>Name</strong></TableCell>
+            <TableCell><strong>Slug</strong></TableCell>
+            <TableCell><strong>Color</strong></TableCell>
+            <TableCell><strong>Description</strong></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {categories.map((category) => (
-            <TableRow key={category.id}>
-              <TableCell>{category.name}</TableCell>
-              <TableCell>{category.slug}</TableCell>
+          {categories.map((cat) => (
+            <TableRow key={cat.id}>
+              <TableCell>{cat.name}</TableCell>
+              <TableCell>{cat.slug}</TableCell>
               <TableCell>
-                <span
+                <Chip
+                  label={cat.color}
                   style={{
-                    display: "inline-block",
-                    backgroundColor: category.color,
-                    width: 16,
-                    height: 16,
-                    borderRadius: "50%",
+                    backgroundColor: cat.color,
+                    color: "#fff",
                   }}
-                ></span>{" "}
-                {category.color}
+                />
               </TableCell>
+              <TableCell>{cat.description || "-"}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </Paper>
+    </TableContainer>
   );
-}
+};
+
+export default CategoryTable;
