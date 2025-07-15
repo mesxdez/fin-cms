@@ -59,6 +59,11 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
         // Store the token using auth utilities
         authUtils.setToken(data);
 
+        // Save user info to localStorage
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
+
         // Redirect to dashboard
         router.push("/");
       } else {

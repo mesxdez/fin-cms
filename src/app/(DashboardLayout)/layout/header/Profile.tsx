@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Avatar,
@@ -19,9 +19,22 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import { IconListCheck, IconMail, IconUser } from "@tabler/icons-react";
 import { useTheme } from "@/utils/ThemeContext";
 
-const Profile = () => {
+export default function Profile() {
+  const [user, setUser] = useState<{
+    username?: string;
+    email?: string;
+  } | null>(null);
   const [anchorEl2, setAnchorEl2] = useState(null);
   const { mode, toggleTheme } = useTheme();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        setUser(JSON.parse(userData));
+      }
+    }
+  }, []);
 
   const handleClick2 = (event: any) => {
     setAnchorEl2(event.currentTarget);
@@ -38,36 +51,22 @@ const Profile = () => {
   return (
     <>
       <Box
-        sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          justifyContent: "space-between",
+          width: "100%",
+          cursor: "pointer",
+        }}
         onClick={handleClick2}
       >
-        <IconButton
-          size="large"
-          aria-label="show 11 new notifications"
-          color="inherit"
-          aria-controls="msgs-menu"
-          aria-haspopup="true"
-          sx={{
-            ...(typeof anchorEl2 === "object" && {
-              color: "primary.main",
-            }),
-          }}
-        >
-          <Avatar
-            src="/images/profile/user-1.jpg"
-            alt="image"
-            sx={{
-              width: 35,
-              height: 35,
-            }}
-          />
-        </IconButton>
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="subtitle2" fontWeight={600}>
-            EP
+            {user?.username}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            wijtraprr@gmail.com
+            {user?.email}
           </Typography>
         </Box>
         <IconButton size="small">
@@ -126,6 +125,4 @@ const Profile = () => {
       </Menu>
     </>
   );
-};
-
-export default Profile;
+}
