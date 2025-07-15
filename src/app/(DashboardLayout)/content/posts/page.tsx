@@ -1,7 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PageContainer from "../../components/container/PageContainer";
-import { Box, Grid, CircularProgress, Alert } from "@mui/material";
+import {
+  Box,
+  Grid,
+  CircularProgress,
+  Alert,
+  Select,
+  MenuItem,
+  FormControl,
+} from "@mui/material";
 import ContentListCore from "../../components/dashboard/ContentListCore";
 import EditContentModal from "../../components/modal/EditContentModal";
 import { useContent } from "../../../../utils/useContent";
@@ -10,14 +18,50 @@ const PostsScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editContent, setEditContent] = useState<any>(null);
+  const [statusFilter, setStatusFilter] = useState("All posts");
 
-  // Fetch all content (no status filter)
-  const { contents, loading, error, refetch } = useContent();
+  // Fetch content with status filter
+  const {
+    contents,
+    loading,
+    error,
+    refetch: baseRefetch,
+  } = useContent({
+    status:
+      statusFilter === "All posts" ? undefined : statusFilter.slice(0, -1),
+  });
+  // Refetch with status argument
+  const refetch = (status?: string) => {
+    setStatusFilter(
+      status
+        ? status.charAt(0).toUpperCase() +
+            status.slice(1) +
+            (status.endsWith("s") ? "" : "s")
+        : "All posts"
+    );
+    baseRefetch();
+  };
 
   const handleOnEdit = (id: number) => {
     setIsModalOpen(true);
     setIsEditMode(true);
     setEditContent(contents.find((content) => content.id === id));
+  };
+
+  const handleOnCreate = () => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    setIsModalOpen(true);
+    setIsEditMode(false);
+    setEditContent({
+      title: "",
+      textHtml: "",
+      banner: "",
+      status: "Draft",
+      createdBy: user.username || "",
+      createdDate: "",
+      updatedBy: "",
+      updatedDate: "",
+    });
   };
 
   const handleModalClose = () => {
@@ -26,7 +70,22 @@ const PostsScreen = () => {
     setEditContent(null);
   };
 
-  const handleModalSave = () => {
+  const handleModalSave = async () => {
+    if (isEditMode && editContent?.id) {
+      // Update existing content
+      await fetch(`/api/contents/${editContent.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editContent),
+      });
+    } else {
+      // Create new content
+      await fetch("/api/contents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editContent),
+      });
+    }
     setIsModalOpen(false);
     refetch(); // Refresh data after save
   };
@@ -35,9 +94,10 @@ const PostsScreen = () => {
     setEditContent({ ...editContent, [field]: value });
   };
 
-  const handleOnDelete = (id: number) => {
-    console.log("Deleting content with id:", id);
-    // TODO: Implement delete API call
+  const handleOnDelete = async (id: number) => {
+    await fetch(`/api/contents/${id}`, {
+      method: "DELETE",
+    });
     refetch(); // Refresh data after delete
   };
 
@@ -76,9 +136,11 @@ const PostsScreen = () => {
             <ContentListCore
               title={"Posts"}
               contents={contents}
+              onCreate={handleOnCreate}
               onEdit={handleOnEdit}
               onDelete={handleOnDelete}
               onPreview={handleOnPreview}
+              refetch={refetch}
             />
           </Grid>
         </Grid>

@@ -28,7 +28,22 @@ const ScheduledScreen = () => {
     setEditContent(null);
   };
 
-  const handleModalSave = () => {
+  const handleModalSave = async () => {
+    if (isEditMode && editContent?.id) {
+      // Update existing content
+      await fetch(`/api/contents/${editContent.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editContent),
+      });
+    } else {
+      // Create new content
+      await fetch("/api/contents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editContent),
+      });
+    }
     setIsModalOpen(false);
     refetch(); // Refresh data after save
   };
@@ -37,14 +52,31 @@ const ScheduledScreen = () => {
     setEditContent({ ...editContent, [field]: value });
   };
 
-  const handleOnDelete = (id: number) => {
-    console.log("Deleting scheduled content with id:", id);
-    // TODO: Implement delete API call
+  const handleOnDelete = async (id: number) => {
+    await fetch(`/api/contents/${id}`, {
+      method: "DELETE",
+    });
     refetch(); // Refresh data after delete
   };
 
   const handleOnPreview = (id: number) => {
     // TODO: Implement preview
+  };
+
+  const handleOnCreate = () => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    setIsModalOpen(true);
+    setIsEditMode(false);
+    setEditContent({
+      title: "",
+      textHtml: "",
+      banner: "",
+      status: "Scheduled",
+      createdBy: user.username || "",
+      createdDate: "",
+      updatedBy: "",
+      updatedDate: "",
+    });
   };
 
   if (loading) {
@@ -78,6 +110,7 @@ const ScheduledScreen = () => {
             <ContentListCore
               title={"Scheduled"}
               contents={contents}
+              onCreate={handleOnCreate}
               onEdit={handleOnEdit}
               onDelete={handleOnDelete}
               onPreview={handleOnPreview}

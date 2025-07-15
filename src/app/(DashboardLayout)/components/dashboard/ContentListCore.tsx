@@ -17,7 +17,7 @@ import {
   TablePagination,
 } from "@mui/material";
 import { IconPencil, IconTrash, IconEye, IconPlus } from "@tabler/icons-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import DashboardCard from "../shared/DashboardCard";
 import { useTheme } from "@mui/material/styles";
 
@@ -177,6 +177,7 @@ interface ContentListCoreProps {
   actionButton?: ReactNode;
   title?: string;
   onCreate?: () => void;
+  refetch?: (status?: string) => void;
 }
 
 const ContentListCore = ({
@@ -188,6 +189,7 @@ const ContentListCore = ({
   actionButton,
   title,
   onCreate,
+  refetch,
 }: ContentListCoreProps) => {
   const theme = useTheme();
   const [page, setPage] = useState(0);
@@ -207,6 +209,13 @@ const ContentListCore = ({
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const handlePostFilterChange = (value: string) => {
+    setPostFilter(value);
+    if (refetch) {
+      refetch(value === "All posts" ? undefined : value.slice(0, -1));
+    }
   };
 
   const startIndex = page * rowsPerPage;
@@ -229,7 +238,7 @@ const ContentListCore = ({
               <FormControl size="small" sx={{ minWidth: 120 }}>
                 <Select
                   value={postFilter}
-                  onChange={(e) => setPostFilter(e.target.value)}
+                  onChange={(e) => handlePostFilterChange(e.target.value)}
                 >
                   <MenuItem value="All posts">All posts</MenuItem>
                   <MenuItem value="Drafts">Drafts</MenuItem>

@@ -10,8 +10,6 @@ function hashPassword(password: string): string {
 export async function POST(req: NextRequest) {
   try {
     const { username, password } = await req.json();
-    console.log("🚀 ~ POST ~ username:", username);
-    console.log("🚀 ~ POST ~ password:", password);
     if (!username || !password) {
       return NextResponse.json(
         { error: "Username and password are required" },
@@ -21,7 +19,6 @@ export async function POST(req: NextRequest) {
 
     // Hash the provided password
     const hashedPassword = hashPassword(password);
-
     // Check user credentials
     const { data, error } = await supabase
       .from("users")
@@ -29,7 +26,6 @@ export async function POST(req: NextRequest) {
       .eq("username", username)
       .eq("password", password);
 
-    console.log("🚀 ~ POST ~ data:", data);
     if (error || !data) {
       return NextResponse.json(
         { error: "Invalid credentials" },
@@ -44,7 +40,9 @@ export async function POST(req: NextRequest) {
       accessToken: token,
       expiresIn: 3600,
       user: {
-        username: username,
+        username: data[0]?.username,
+        email: data[0]?.email,
+        role: data[0]?.role,
       },
     });
   } catch (error) {
