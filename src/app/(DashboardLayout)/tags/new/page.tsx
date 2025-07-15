@@ -1,29 +1,23 @@
 "use client";
 
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Button,
   Container,
+  Stack,
+  TextField,
+  Button,
+  Typography,
+  Box,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  InputLabel,
-  OutlinedInput,
-  Stack,
-  TextField,
-  Typography,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
 
 export default function NewTagPage() {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
-  const [color, setColor] = useState("#15171A");
+  const [color, setColor] = useState("#1976d2");
   const [description, setDescription] = useState("");
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDesc, setMetaDesc] = useState("");
@@ -35,45 +29,49 @@ export default function NewTagPage() {
   const [tagHeader, setTagHeader] = useState("");
   const [tagFooter, setTagFooter] = useState("");
 
-  // ✅ Modal state
+  const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = async () => {
-    const payload = {
-      name,
-      slug,
-      color,
-      description,
-      metaTitle,
-      metaDesc,
-      canonicalUrl,
-      xTitle,
-      xDesc,
-      fbTitle,
-      fbDesc,
-      tagHeader,
-      tagFooter,
-    };
+    setLoading(true);
+    setError(null);
 
     try {
+      const payload = {
+        name,
+        slug,
+        color,
+        description,
+        metaTitle,
+        metaDesc,
+        canonicalUrl,
+        xTitle,
+        xDesc,
+        fbTitle,
+        fbDesc,
+        tagHeader,
+        tagFooter,
+      };
+
       const res = await fetch("/api/tags", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to save tag");
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error || "Failed to save tag");
+      }
 
-      const result = await res.json();
-      console.log("✅ Tag created:", result);
-      setOpenModal(true); // ✅ Show modal
+      // success
+      setOpenModal(true);
 
-      // Reset form
+      // reset form
       setName("");
       setSlug("");
-      setColor("#15171A");
+      setColor("#1976d2");
       setDescription("");
       setMetaTitle("");
       setMetaDesc("");
@@ -84,21 +82,158 @@ export default function NewTagPage() {
       setFbDesc("");
       setTagHeader("");
       setTagFooter("");
-    } catch (err) {
-      console.error("❌ Error saving tag:", err);
-      alert("Failed to save tag. Please try again.");
+    } catch (err: any) {
+      setError(err.message || "Unknown error");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // auto-generate slug when name changes
+  const onNameChange = (val: string) => {
+    setName(val);
+    setSlug(val.toLowerCase().trim().replace(/\s+/g, "-"));
+  };
+
   return (
-    <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
-      {/* ✅ Modal */}
+    <Container maxWidth="sm" sx={{ py: 4 }}>
+      <Typography variant="h5" fontWeight="bold" mb={3}>
+        Create New Tag
+      </Typography>
+
+      <Stack spacing={3}>
+        <TextField
+          label="Name"
+          value={name}
+          onChange={(e) => onNameChange(e.target.value)}
+          fullWidth
+          required
+          helperText="Start with # for internal tags"
+        />
+
+        <TextField
+          label="Slug"
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          fullWidth
+          required
+          helperText="Unique slug for URL"
+        />
+
+        <Box>
+          <Typography>Color</Typography>
+          <input
+            type="color"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            style={{ width: 50, height: 40, border: "none", cursor: "pointer" }}
+          />
+        </Box>
+
+        <TextField
+          label="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          multiline
+          rows={3}
+          fullWidth
+        />
+
+        <TextField
+          label="Meta Title"
+          value={metaTitle}
+          onChange={(e) => setMetaTitle(e.target.value)}
+          fullWidth
+        />
+
+        <TextField
+          label="Meta Description"
+          value={metaDesc}
+          onChange={(e) => setMetaDesc(e.target.value)}
+          multiline
+          rows={2}
+          fullWidth
+        />
+
+        <TextField
+          label="Canonical URL"
+          value={canonicalUrl}
+          onChange={(e) => setCanonicalUrl(e.target.value)}
+          fullWidth
+        />
+
+        <TextField
+          label="X Title"
+          value={xTitle}
+          onChange={(e) => setXTitle(e.target.value)}
+          fullWidth
+        />
+
+        <TextField
+          label="X Description"
+          value={xDesc}
+          onChange={(e) => setXDesc(e.target.value)}
+          multiline
+          rows={2}
+          fullWidth
+        />
+
+        <TextField
+          label="Facebook Title"
+          value={fbTitle}
+          onChange={(e) => setFbTitle(e.target.value)}
+          fullWidth
+        />
+
+        <TextField
+          label="Facebook Description"
+          value={fbDesc}
+          onChange={(e) => setFbDesc(e.target.value)}
+          multiline
+          rows={2}
+          fullWidth
+        />
+
+        <TextField
+          label="Tag Header (Code Injection)"
+          value={tagHeader}
+          onChange={(e) => setTagHeader(e.target.value)}
+          multiline
+          rows={3}
+          fullWidth
+        />
+
+        <TextField
+          label="Tag Footer (Code Injection)"
+          value={tagFooter}
+          onChange={(e) => setTagFooter(e.target.value)}
+          multiline
+          rows={3}
+          fullWidth
+        />
+
+        {error && (
+          <Typography color="error" variant="body2">
+            {error}
+          </Typography>
+        )}
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSave}
+          disabled={loading}
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          {loading ? "Saving..." : "Save"}
+        </Button>
+      </Stack>
+
       <Dialog open={openModal} onClose={() => setOpenModal(false)}>
         <DialogTitle>🎉 Tag Created Successfully</DialogTitle>
         <DialogContent>
-          <Typography>
-            The tag "<strong>{name}</strong>" has been saved successfully.
-          </Typography>
+          <Typography>The tag "{name}" has been saved.</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)} autoFocus>
@@ -106,180 +241,6 @@ export default function NewTagPage() {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Stack spacing={3} alignItems="center">
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h5" fontWeight="bold">New tag</Typography>
-        </Box>
-
-        {/* Main Fields */}
-        <Stack spacing={3} sx={{ width: "100%", maxWidth: 500 }}>
-          <Box display="flex" gap={2}>
-            <TextField
-              label="Name"
-              fullWidth
-              value={name}
-              onChange={(e) => {
-                const value = e.target.value;
-                setName(value);
-                setSlug(value.toLowerCase().replace(/\s+/g, "-"));
-              }}
-              helperText="Start with # to create internal tags"
-            />
-            <Box>
-              <InputLabel shrink>Color</InputLabel>
-              <OutlinedInput
-                type="color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                sx={{ width: 64, height: 56, padding: 0 }}
-              />
-            </Box>
-          </Box>
-
-          <TextField
-            label="Slug"
-            fullWidth
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            helperText="https://your-site.com/tag/[slug]"
-          />
-
-          <TextField
-            label="Description"
-            fullWidth
-            multiline
-            rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            helperText="Maximum: 500 characters"
-          />
-        </Stack>
-
-        {/* Meta Data */}
-        <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography fontWeight="bold">Meta data</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Stack spacing={2}>
-              <TextField
-                label="Meta title"
-                fullWidth
-                value={metaTitle}
-                onChange={(e) => setMetaTitle(e.target.value)}
-              />
-              <TextField
-                label="Meta description"
-                fullWidth
-                multiline
-                rows={2}
-                value={metaDesc}
-                onChange={(e) => setMetaDesc(e.target.value)}
-              />
-              <TextField
-                label="Canonical URL"
-                fullWidth
-                value={canonicalUrl}
-                onChange={(e) => setCanonicalUrl(e.target.value)}
-              />
-            </Stack>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* X Card */}
-        <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography fontWeight="bold">X card</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Stack spacing={2}>
-              <Button variant="outlined" fullWidth>
-                Add X image
-              </Button>
-              <TextField
-                label="X title"
-                fullWidth
-                value={xTitle}
-                onChange={(e) => setXTitle(e.target.value)}
-              />
-              <TextField
-                label="X description"
-                fullWidth
-                multiline
-                rows={2}
-                value={xDesc}
-                onChange={(e) => setXDesc(e.target.value)}
-              />
-            </Stack>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Facebook Card */}
-        <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography fontWeight="bold">Facebook card</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Stack spacing={2}>
-              <Button variant="outlined" fullWidth>
-                Add Facebook image
-              </Button>
-              <TextField
-                label="Facebook title"
-                fullWidth
-                value={fbTitle}
-                onChange={(e) => setFbTitle(e.target.value)}
-              />
-              <TextField
-                label="Facebook description"
-                fullWidth
-                multiline
-                rows={2}
-                value={fbDesc}
-                onChange={(e) => setFbDesc(e.target.value)}
-              />
-            </Stack>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Code Injection */}
-        <Accordion sx={{ mt: 2, width: "100%", maxWidth: 500 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography fontWeight="bold">Code injection</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Stack spacing={2}>
-              <TextField
-                label="Tag header"
-                fullWidth
-                multiline
-                minRows={3}
-                value={tagHeader}
-                onChange={(e) => setTagHeader(e.target.value)}
-              />
-              <TextField
-                label="Tag footer"
-                fullWidth
-                multiline
-                minRows={3}
-                value={tagFooter}
-                onChange={(e) => setTagFooter(e.target.value)}
-              />
-            </Stack>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Save Button */}
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ mt: 4, width: "100%", maxWidth: 500 }}
-          onClick={handleSave}
-        >
-          Save
-        </Button>
-      </Stack>
     </Container>
   );
 }
