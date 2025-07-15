@@ -1,9 +1,17 @@
-'use client';
-import { useEffect, useState } from 'react';
+"use client";
+
+import { useEffect, useState } from "react";
 import {
-  Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Typography, Chip
-} from '@mui/material';
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  Chip,
+} from "@mui/material";
 
 interface Tag {
   id: string;
@@ -13,29 +21,35 @@ interface Tag {
   description?: string;
 }
 
-const TagTable = () => {
+export default function TagTable() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTags = async () => {
+    async function fetchTags() {
       try {
-        const res = await fetch('/api/tags');
-        const data = await res.json();
-        setTags(data);
-      } catch (err) {
-        console.error('❌ Failed to fetch tags:', err);
+        const res = await fetch("/api/tags");
+        if (!res.ok) throw new Error(`Error: ${res.statusText}`);
+        const json = await res.json();
+
+        if (!json.data || !Array.isArray(json.data)) {
+          throw new Error("Invalid data format from API");
+        }
+
+        setTags(json.data);
+      } catch (err: any) {
+        setError(err.message || "Unknown error");
       } finally {
         setLoading(false);
       }
-    };
-
+    }
     fetchTags();
   }, []);
 
-  if (loading) {
-    return <Typography>Loading...</Typography>;
-  }
+  if (loading) return <Typography>Loading tags...</Typography>;
+  if (error) return <Typography color="error">Failed to load tags: {error}</Typography>;
+  if (tags.length === 0) return <Typography>No tags found.</Typography>;
 
   return (
     <TableContainer component={Paper}>
@@ -56,19 +70,18 @@ const TagTable = () => {
               <TableCell>
                 <Chip
                   label={tag.color}
-                  style={{
+                  sx={{
                     backgroundColor: tag.color,
-                    color: '#fff'
+                    color: "#fff",
+                    fontWeight: "bold",
                   }}
                 />
               </TableCell>
-              <TableCell>{tag.description || '-'}</TableCell>
+              <TableCell>{tag.description || "-"}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </TableContainer>
   );
-};
-
-export default TagTable;
+}
