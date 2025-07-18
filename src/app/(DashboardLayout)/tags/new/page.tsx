@@ -233,7 +233,7 @@ export default function NewTagPage() {
       <Dialog open={openModal} onClose={() => setOpenModal(false)}>
         <DialogTitle>🎉 Tag Created Successfully</DialogTitle>
         <DialogContent>
-          <Typography>The tag "{name}" has been saved.</Typography>
+          <Typography>The tag &quot;{name}&quot; has been saved.</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)} autoFocus>

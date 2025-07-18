@@ -183,7 +183,9 @@ export default function NewCategoryPage() {
       <Dialog open={openModal} onClose={() => setOpenModal(false)}>
         <DialogTitle>🎉 Category Created</DialogTitle>
         <DialogContent>
-          <Typography>The category "{name}" has been saved.</Typography>
+          <Typography>
+            The category &quot;{name}&quot; has been saved.
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)} autoFocus>
