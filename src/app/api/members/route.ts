@@ -1,73 +1,104 @@
-import { NextResponse } from 'next/server'
+import { supabase } from "@/lib/supabase";
+import { NextResponse } from "next/server";
 
-const mockMembers = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john@example.com',
-    note: 'Top member in July campaign',
-    labels: ['subscriber', 'vip'],
-    newsletter: true,
-    role: 'Admin',
-    createdAt: new Date().toISOString(),
-    status: 'Active',
-    openRate: '68%',
-    location: 'Bangkok, TH',
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    note: 'Joined from webinar',
-    labels: ['free'],
-    newsletter: false,
-    role: 'Member',
-    createdAt: new Date().toISOString(),
-    status: 'Free',
-    openRate: '25%',
-    location: 'Chiang Mai, TH',
-  },
-  {
-    id: '3',
-    name: 'Emily Johnson',
-    email: 'emily@example.com',
-    note: '',
-    labels: ['editor', 'newsletter'],
-    newsletter: true,
-    role: 'Editor',
-    createdAt: new Date().toISOString(),
-    status: 'Active',
-    openRate: '52%',
-    location: 'Singapore',
-  },
-  {
-    id: '4',
-    name: 'Michael Lee',
-    email: 'michael@example.com',
-    note: 'Contacted support for integration',
-    labels: [],
-    newsletter: false,
-    role: 'Member',
-    createdAt: new Date().toISOString(),
-    status: 'Free',
-    openRate: 'N/A',
-    location: 'Unknown',
-  }
-];
 
-// GET /api/members
 export async function GET() {
-  return NextResponse.json(mockMembers)
+  const { data, error } = await supabase
+    .from("members")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  return NextResponse.json(data);
 }
 
-// POST /api/members
-export async function POST(req: Request) {
-  const body = await req.json()
-  const newMember = {
-    ...body,
-    id: Date.now().toString(), // mock id
-    createdAt: new Date().toISOString()
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    // สมมติว่ารับ name, email, password, role, labels (เป็น array), note, newsletter
+
+    const { name, email, password, role, labels, note, newsletter } = body;
+
+    // labels ถ้าเป็น string แปลงเป็น array เช่น แยกด้วย comma
+    const labelsArray = typeof labels === "string" ? labels.split(",").map((l: string) => l.trim()) : labels;
+
+    const { data, error } = await supabase
+      .from("members")
+      .insert([
+        {
+          name,
+          email,
+          password,
+          role,
+          labels: labelsArray,
+          note,
+          newsletter,
+          status: "Active",
+          open_rate: "N/A",
+          location: "",
+          created_at: new Date().toISOString(),
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json(data, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
-  mockMembers.push(newMember)
-  return NextResponse.json(newMember, { status: 201 })
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, ...updates } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+    // แปลง labels ถ้ามี
+    if (updates.labels && typeof updates.labels === "string") {
+      updates.labels = updates.labels.split(",").map((l: string) => l.trim());
+    }
+
+    const { data, error } = await supabase
+      .from("members")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json(data);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+    const { error } = await supabase.from("members").delete().eq("id", id);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ message: "Deleted" });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
 }

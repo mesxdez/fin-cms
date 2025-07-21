@@ -2,7 +2,7 @@
 
 import {
   Table, TableHead, TableRow, TableCell, TableBody,
-  Avatar, Typography, Box
+  Avatar, Typography, Box, CircularProgress
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -12,22 +12,45 @@ type Member = {
   email: string;
   role?: string;
   status?: string;
-  openRate?: string;
-  location?: string;
-  createdAt?: string;
+  // ลบ openRate, location, createdAt ออก
 };
 
 const MemberTable = () => {
   const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMembers = async () => {
-      const res = await fetch('/api/members');
-      const data = await res.json();
-      setMembers(data);
+      try {
+        const res = await fetch('/api/members');
+        if (!res.ok) throw new Error(`Failed to fetch: ${res.statusText}`);
+        const data = await res.json();
+        setMembers(data);
+      } catch (err: any) {
+        setError(err.message || 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
     };
     fetchMembers();
   }, []);
+
+  if (loading) {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center', color: 'red' }}>
+        <Typography>Error loading members: {error}</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ border: '1px solid #eee', borderRadius: 2, overflow: 'hidden' }}>
@@ -38,32 +61,22 @@ const MemberTable = () => {
             <TableCell>Name</TableCell>
             <TableCell>Role</TableCell>
             <TableCell>Status</TableCell>
-            <TableCell>Open Rate</TableCell>
-            <TableCell>Location</TableCell>
-            <TableCell>Created</TableCell>
+            {/* ลบ TableCell ของ Open Rate, Location, Created ออก */}
           </TableRow>
         </TableHead>
         <TableBody>
           {members.map((m) => (
             <TableRow key={m.id}>
-              <TableCell><Avatar>{m.name?.[0] ?? '-'}</Avatar></TableCell>
+              <TableCell>
+                <Avatar>{m.name?.charAt(0).toUpperCase() ?? '-'}</Avatar>
+              </TableCell>
               <TableCell>
                 <Typography fontWeight={500}>{m.name}</Typography>
                 <Typography variant="body2" color="text.secondary">{m.email}</Typography>
               </TableCell>
               <TableCell>{m.role ?? 'Member'}</TableCell>
               <TableCell>{m.status ?? 'Free'}</TableCell>
-              <TableCell>{m.openRate ?? 'N/A'}</TableCell>
-              <TableCell>{m.location ?? 'Unknown'}</TableCell>
-              <TableCell>
-                {m.createdAt
-                  ? new Date(m.createdAt).toLocaleDateString('en-GB', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric'
-                    })
-                  : '-'}
-              </TableCell>
+              {/* ลบ cell ของ openRate, location, createdAt ออก */}
             </TableRow>
           ))}
         </TableBody>
