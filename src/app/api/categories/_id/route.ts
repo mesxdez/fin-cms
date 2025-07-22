@@ -6,11 +6,8 @@ let categories = [
 ];
 
 // GET /api/categories/:id
-export async function GET(
-  _: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params;
+export async function GET(_: Request, context: { params: { id: string } }) {
+  const { id } = context.params;
   const category = categories.find((c) => c.id === id);
   if (!category)
     return NextResponse.json({ message: "Not found" }, { status: 404 });
@@ -18,11 +15,8 @@ export async function GET(
 }
 
 // PUT /api/categories/:id
-export async function PUT(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params;
+export async function PUT(req: Request, context: { params: { id: string } }) {
+  const { id } = context.params;
   const index = categories.findIndex((c) => c.id === id);
   if (index === -1)
     return NextResponse.json({ message: "Not found" }, { status: 404 });
@@ -33,11 +27,8 @@ export async function PUT(
 }
 
 // DELETE /api/categories/:id
-export async function DELETE(
-  _: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params;
+export async function DELETE(_: Request, context: { params: { id: string } }) {
+  const { id } = context.params;
   const index = categories.findIndex((c) => c.id === id);
   if (index === -1)
     return NextResponse.json({ message: "Not found" }, { status: 404 });

@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, params: { id: string }) {
   try {
     const { id } = params;
-
     const { data, error } = await supabase
       .from("contents")
       .select("*")
@@ -28,10 +24,7 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: NextRequest, params: { id: string }) {
   try {
     const { id } = params;
     const { title, textHtml, banner, updatedBy, status } = await req.json();
@@ -83,10 +76,7 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, params: { id: string }) {
   try {
     const { id } = params;
 

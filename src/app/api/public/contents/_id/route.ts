@@ -3,10 +3,10 @@ import { supabase } from "@/lib/supabase";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id } = context.params;
     const { data, error } = await supabase
       .from("contents")
       .select("*")
