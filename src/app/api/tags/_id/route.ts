@@ -11,11 +11,8 @@ let tags: any[] = [
 ];
 
 // GET /api/tags/:id
-export async function GET(
-  _: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params;
+export async function GET(_: Request, context: { params: { id: string } }) {
+  const { id } = context.params;
   const tag = tags.find((t) => t.id === id);
   if (!tag)
     return NextResponse.json({ message: "Tag not found" }, { status: 404 });
@@ -23,11 +20,8 @@ export async function GET(
 }
 
 // PUT /api/tags/:id
-export async function PUT(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params;
+export async function PUT(req: Request, context: { params: { id: string } }) {
+  const { id } = context.params;
   const index = tags.findIndex((t) => t.id === id);
   if (index === -1)
     return NextResponse.json({ message: "Tag not found" }, { status: 404 });
@@ -38,11 +32,8 @@ export async function PUT(
 }
 
 // DELETE /api/tags/:id
-export async function DELETE(
-  _: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params;
+export async function DELETE(_: Request, context: { params: { id: string } }) {
+  const { id } = context.params;
   const index = tags.findIndex((t) => t.id === id);
   if (index === -1)
     return NextResponse.json({ message: "Tag not found" }, { status: 404 });

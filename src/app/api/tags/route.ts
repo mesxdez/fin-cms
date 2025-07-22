@@ -13,12 +13,17 @@ export async function GET(req: NextRequest) {
 
     // filter by search
     if (search) {
-      query = query.ilike("name", `%${search}%`);
+      // @ts-ignore: 'or' exists at runtime, but is missing from the type definition
+      query = (query as any).or(
+        `name.ilike.%${search}%,description.ilike.%${search}%`
+      );
     }
 
     // total count
-    const { count, error: countError } = await query
-      .select("*", { count: "exact", head: true });
+    const { count, error: countError } = await query.select("*", {
+      count: "exact",
+      head: true,
+    });
 
     if (countError) {
       console.error("❌ Count error:", countError.message || countError);
@@ -33,7 +38,10 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       console.error("❌ Supabase fetch error:", error.message || error);
-      return NextResponse.json({ error: "Failed to fetch tags" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to fetch tags" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
@@ -69,7 +77,10 @@ export async function POST(req: NextRequest) {
     } = await req.json();
 
     if (!name || !slug) {
-      return NextResponse.json({ error: "Missing name or slug" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing name or slug" },
+        { status: 400 }
+      );
     }
 
     // check duplicate
@@ -81,37 +92,48 @@ export async function POST(req: NextRequest) {
 
     if (checkError) {
       console.error("❌ Check error:", checkError.message || checkError);
-      return NextResponse.json({ error: "Failed to check existing tag" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to check existing tag" },
+        { status: 500 }
+      );
     }
 
     if (existingTag) {
-      return NextResponse.json({ error: "Tag already exists" }, { status: 409 });
+      return NextResponse.json(
+        { error: "Tag already exists" },
+        { status: 409 }
+      );
     }
 
     const { data, error } = await supabase
       .from("tags")
-      .insert([{
-        name,
-        slug,
-        color,
-        description,
-        meta_title: metaTitle,
-        meta_description: metaDesc,
-        canonical_url: canonicalUrl,
-        x_title: xTitle,
-        x_description: xDesc,
-        fb_title: fbTitle,
-        fb_description: fbDesc,
-        tag_header: tagHeader,
-        tag_footer: tagFooter,
-        createddate: new Date().toISOString(), // ✅ ต้องมีในตาราง
-      }])
+      .insert([
+        {
+          name,
+          slug,
+          color,
+          description,
+          meta_title: metaTitle,
+          meta_description: metaDesc,
+          canonical_url: canonicalUrl,
+          x_title: xTitle,
+          x_description: xDesc,
+          fb_title: fbTitle,
+          fb_description: fbDesc,
+          tag_header: tagHeader,
+          tag_footer: tagFooter,
+          createddate: new Date().toISOString(), // ✅ ต้องมีในตาราง
+        },
+      ])
       .select()
       .single();
 
     if (error) {
       console.error("❌ Insert error:", error.message || error);
-      return NextResponse.json({ error: "Failed to create tag" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to create tag" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json(
@@ -120,6 +142,9 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: any) {
     console.error("❌ POST error:", error.message || error);
-    return NextResponse.json({ error: "Failed to create tag" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create tag" },
+      { status: 500 }
+    );
   }
 }

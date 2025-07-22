@@ -35,12 +35,12 @@ function checkAuth(req: NextRequest) {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   if (!checkAuth(req)) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  const { id } = await params;
+  const { id } = params;
   const contentId = parseInt(id, 10);
   const content = contents.find((c: any) => c.id === contentId);
   if (!content) {
@@ -51,12 +51,12 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   if (!checkAuth(req)) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  const { id } = await params;
+  const { id } = params;
   const contentId = parseInt(id, 10);
   const idx = contents.findIndex((c: any) => c.id === contentId);
   if (idx === -1) {
@@ -74,12 +74,12 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   if (!checkAuth(req)) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  const { id } = await params;
+  const { id } = params;
   const contentId = parseInt(id, 10);
   const idx = contents.findIndex((c: any) => c.id === contentId);
   if (idx === -1) {
