@@ -13,14 +13,23 @@ export async function GET(req: NextRequest) {
 
     // filter
     if (search) {
-      baseQuery = baseQuery.ilike("name", `%${search}%`);
+      // @ts-ignore: 'or' exists at runtime, but is missing from the type definition
+      baseQuery = (baseQuery as any).or(
+        `name.ilike.%${search}%,description.ilike.%${search}%`
+      );
     }
 
     // count
-    const countRes = await baseQuery.select("*", { count: "exact", head: true });
+    const countRes = await baseQuery.select("*", {
+      count: "exact",
+      head: true,
+    });
     if (countRes.error) {
       console.error("Count error:", countRes.error.message);
-      return NextResponse.json({ error: "Failed to count categories" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to count categories" },
+        { status: 500 }
+      );
     }
     const count = countRes.count || 0;
 
@@ -32,7 +41,10 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       console.error("Supabase fetch error:", error.message);
-      return NextResponse.json({ error: "Failed to fetch categories" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to fetch categories" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
@@ -44,7 +56,10 @@ export async function GET(req: NextRequest) {
     });
   } catch (error: any) {
     console.error("❌ categories route GET failed:", error.message || error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -66,7 +81,10 @@ export async function POST(req: NextRequest) {
     } = await req.json();
 
     if (!name || !slug) {
-      return NextResponse.json({ error: "Name and slug are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Name and slug are required" },
+        { status: 400 }
+      );
     }
 
     const { data: existing, error: checkError } = await supabase
@@ -77,11 +95,17 @@ export async function POST(req: NextRequest) {
 
     if (checkError) {
       console.error("Check existing error:", checkError.message);
-      return NextResponse.json({ error: "Failed to check category" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to check category" },
+        { status: 500 }
+      );
     }
 
     if (existing) {
-      return NextResponse.json({ error: "Category already exists" }, { status: 409 });
+      return NextResponse.json(
+        { error: "Category already exists" },
+        { status: 409 }
+      );
     }
 
     const insertPayload = {
@@ -110,9 +134,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Insert failed" }, { status: 500 });
     }
 
-    return NextResponse.json({ message: "Category created", data }, { status: 201 });
+    return NextResponse.json(
+      { message: "Category created", data },
+      { status: 201 }
+    );
   } catch (error: any) {
     console.error("❌ POST categories failed:", error.message || error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
