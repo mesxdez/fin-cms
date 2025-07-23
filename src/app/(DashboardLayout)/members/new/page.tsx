@@ -22,28 +22,60 @@ import { useState } from 'react';
 export default function NewMemberPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [labels, setLabels] = useState('');
   const [note, setNote] = useState('');
   const [newsletter, setNewsletter] = useState(true);
-  const [role, setRole] = useState('Member'); // ✅ Default role
+  const [role, setRole] = useState('Member');
   const [openModal, setOpenModal] = useState(false);
+  const [message, setMessage] = useState('');
 
   const handleSave = async () => {
-    const res = await fetch('/api/members', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, labels, note, newsletter, role })
-    });
+    setMessage('')
+    try {
+      const res = await fetch('/api/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          role,
+          labels: labels ? labels.split(',').map(l => l.trim()) : [],
+          note,
+          newsletter,
+        }),
+      })
 
-    if (res.ok) {
-      setOpenModal(true);
-    } else {
-      alert('❌ Failed to create member');
+      if (res.ok) {
+        setOpenModal(true)
+        setMessage('Member created successfully!')
+        // reset form if needed
+        setName('')
+        setEmail('')
+        setPassword('')
+        setLabels('')
+        setNote('')
+        setNewsletter(true)
+        setRole('Member')
+      } else {
+        // อ่าน response body อย่างปลอดภัย
+        const text = await res.text()
+        let data = {}
+        try {
+          data = JSON.parse(text)
+        } catch {
+          data = { error: text || 'Unknown error' }
+        }
+        setMessage(`Failed: ${data.error || 'Unknown error'}`)
+      }
+    } catch (error: any) {
+      setMessage(`Failed: ${error.message || 'Unknown error'}`)
     }
   };
 
   const handleCloseModal = () => {
-    setOpenModal(false);
+    setOpenModal(false)
   };
 
   return (
@@ -51,7 +83,7 @@ export default function NewMemberPage() {
       <Dialog open={openModal} onClose={handleCloseModal}>
         <DialogTitle>✅ Member Created</DialogTitle>
         <DialogContent>
-          <Typography>Member <strong>{name}</strong> has been successfully created.</Typography>
+          <Typography>{message}</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseModal} autoFocus>
@@ -93,6 +125,14 @@ export default function NewMemberPage() {
             </Box>
 
             <TextField
+              label="Password"
+              fullWidth
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <TextField
               select
               label="Role"
               fullWidth
@@ -105,11 +145,11 @@ export default function NewMemberPage() {
             </TextField>
 
             <TextField
-              label="Labels"
+              label="Labels (comma separated)"
               fullWidth
               value={labels}
               onChange={(e) => setLabels(e.target.value)}
-              placeholder="Add label..."
+              placeholder="e.g. vip,subscriber"
             />
 
             <TextField

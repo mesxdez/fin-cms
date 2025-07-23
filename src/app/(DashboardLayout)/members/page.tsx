@@ -3,6 +3,7 @@
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import MemberTable from '../components/members/MemberTable';
 import MemberCard from '../components/members/MemberCard';
+import Link from 'next/link';
 
 
 const MembersPage = () => {
@@ -10,7 +11,15 @@ const MembersPage = () => {
     <Container maxWidth="lg" sx={{ pt: 4 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4" fontWeight="bold">Members</Typography>
-        <Button variant="contained" color="primary">New member</Button>
+      <Button 
+      variant="contained" 
+      color="primary" 
+      component={Link} 
+      href="/members/new"
+      // If you want to preserve the <a> behavior you can add legacyBehavior or passHref, but usually not needed here
+    >
+      New member
+    </Button>
       </Stack>
 
       <MemberTable />
