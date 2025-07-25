@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     // fetch data
     const { data, error } = await query
       .select("*")
-      .order("createddate", { ascending: false })
+      .order("createdDate", { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
 
     if (error) {
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
           fb_description: fbDesc,
           tag_header: tagHeader,
           tag_footer: tagFooter,
-          createddate: new Date().toISOString(), // ✅ ต้องมีในตาราง
+          createdDate: new Date().toISOString(), // ✅ ต้องมีในตาราง
         },
       ])
       .select()

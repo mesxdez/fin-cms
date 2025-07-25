@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     // fetch data
     const { data, error } = await baseQuery
       .select("*")
-      .order("createddate", { ascending: false }) // 🟡 Ensure this column exists!
+      .order("createdDate", { ascending: false }) // 🟡 Ensure this column exists!
       .range((page - 1) * limit, page * limit - 1);
 
     if (error) {
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
       fb_description: fbDesc,
       tag_header: tagHeader,
       tag_footer: tagFooter,
-      createddate: new Date().toISOString(), // ✅ Ensure column exists
+      createdDate: new Date().toISOString(), // ✅ Ensure column exists
     };
 
     const { data, error } = await supabase
