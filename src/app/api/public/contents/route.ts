@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
     // Get paginated data
     const { data, error } = await query
-      .order("createddate", { ascending: false })
+      .order("createdDate", { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
 
     if (error) {
