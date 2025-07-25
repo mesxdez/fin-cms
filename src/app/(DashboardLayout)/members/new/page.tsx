@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Avatar,
@@ -15,67 +15,69 @@ import {
   Switch,
   TextField,
   Typography,
-  MenuItem
-} from '@mui/material';
-import { useState } from 'react';
+  MenuItem,
+} from "@mui/material";
+import { useState } from "react";
+
+type ErrorData = { error?: string };
 
 export default function NewMemberPage() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [labels, setLabels] = useState('');
-  const [note, setNote] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [labels, setLabels] = useState("");
+  const [note, setNote] = useState("");
   const [newsletter, setNewsletter] = useState(true);
-  const [role, setRole] = useState('Member');
+  const [role, setRole] = useState("Member");
   const [openModal, setOpenModal] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const handleSave = async () => {
-    setMessage('')
+    setMessage("");
     try {
-      const res = await fetch('/api/members', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/members", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
           email,
           password,
           role,
-          labels: labels ? labels.split(',').map(l => l.trim()) : [],
+          labels: labels ? labels.split(",").map((l) => l.trim()) : [],
           note,
           newsletter,
         }),
-      })
+      });
 
       if (res.ok) {
-        setOpenModal(true)
-        setMessage('Member created successfully!')
+        setOpenModal(true);
+        setMessage("Member created successfully!");
         // reset form if needed
-        setName('')
-        setEmail('')
-        setPassword('')
-        setLabels('')
-        setNote('')
-        setNewsletter(true)
-        setRole('Member')
+        setName("");
+        setEmail("");
+        setPassword("");
+        setLabels("");
+        setNote("");
+        setNewsletter(true);
+        setRole("Member");
       } else {
         // อ่าน response body อย่างปลอดภัย
-        const text = await res.text()
-        let data = {}
+        const text = await res.text();
+        let data: ErrorData = {};
         try {
-          data = JSON.parse(text)
+          data = JSON.parse(text);
         } catch {
-          data = { error: text || 'Unknown error' }
+          data = { error: text || "Unknown error" };
         }
-        setMessage(`Failed: ${data.error || 'Unknown error'}`)
+        setMessage(`Failed: ${data.error || "Unknown error"}`);
       }
     } catch (error: any) {
-      setMessage(`Failed: ${error.message || 'Unknown error'}`)
+      setMessage(`Failed: ${error.message || "Unknown error"}`);
     }
   };
 
   const handleCloseModal = () => {
-    setOpenModal(false)
+    setOpenModal(false);
   };
 
   return (
@@ -101,9 +103,11 @@ export default function NewMemberPage() {
       <Box display="flex" gap={4} alignItems="flex-start" mb={4}>
         <Box display="flex" flexDirection="column" alignItems="center">
           <Avatar sx={{ width: 80, height: 80, fontSize: 32 }}>
-            {name ? name[0].toUpperCase() : 'N'}
+            {name ? name[0].toUpperCase() : "N"}
           </Avatar>
-          <Typography mt={1} fontWeight="medium">New member</Typography>
+          <Typography mt={1} fontWeight="medium">
+            New member
+          </Typography>
         </Box>
 
         <Paper variant="outlined" sx={{ flexGrow: 1, p: 3, borderRadius: 2 }}>
@@ -165,10 +169,16 @@ export default function NewMemberPage() {
         </Paper>
       </Box>
 
-      <Box sx={{ maxWidth: 800, ml: 'auto', mr: 'auto' }}>
+      <Box sx={{ maxWidth: 800, ml: "auto", mr: "auto" }}>
         <Paper variant="outlined" sx={{ p: 3, mb: 4, borderRadius: 2 }}>
-          <Typography fontWeight="bold" mb={2}>NEWSLETTERS</Typography>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography fontWeight="bold" mb={2}>
+            NEWSLETTERS
+          </Typography>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <Typography fontWeight="medium">Receive newsletter?</Typography>
             <FormControlLabel
               control={
@@ -181,15 +191,18 @@ export default function NewMemberPage() {
             />
           </Box>
           <Typography variant="body2" color="text.secondary" mt={1}>
-            If disabled, member will <strong>not</strong> receive newsletter emails.
+            If disabled, member will <strong>not</strong> receive newsletter
+            emails.
           </Typography>
         </Paper>
 
         <Paper
           variant="outlined"
-          sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}
+          sx={{ p: 4, textAlign: "center", borderRadius: 2 }}
         >
-          <Typography fontWeight="bold" mb={2}>ACTIVITY</Typography>
+          <Typography fontWeight="bold" mb={2}>
+            ACTIVITY
+          </Typography>
           <Typography variant="h6" color="text.secondary" gutterBottom>
             Activity
           </Typography>
