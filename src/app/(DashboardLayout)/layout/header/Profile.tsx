@@ -18,6 +18,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 
 import { IconListCheck, IconMail, IconUser } from "@tabler/icons-react";
 import { useTheme } from "@/utils/ThemeContext";
+import { useRouter } from "next/navigation";
 
 export default function Profile() {
   const [user, setUser] = useState<{
@@ -26,6 +27,12 @@ export default function Profile() {
   } | null>(null);
   const [anchorEl2, setAnchorEl2] = useState(null);
   const { mode, toggleTheme } = useTheme();
+  const router = useRouter();
+
+  const goToEditProfile = () => {
+    router.push("/editprofile");
+    handleClose2();
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -90,12 +97,13 @@ export default function Profile() {
           },
         }}
       >
-        <MenuItem>
+        <MenuItem onClick={goToEditProfile}>
           <ListItemIcon>
             <IconUser width={20} />
           </ListItemIcon>
           <ListItemText>Profile</ListItemText>
         </MenuItem>
+
         <MenuItem onClick={handleThemeToggle}>
           <ListItemIcon>
             {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
