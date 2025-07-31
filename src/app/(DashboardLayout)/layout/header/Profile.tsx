@@ -30,7 +30,7 @@ export default function Profile() {
   const router = useRouter();
 
   const goToEditProfile = () => {
-    router.push("/editprofile");
+    router.push("/profile");
     handleClose2();
   };
 

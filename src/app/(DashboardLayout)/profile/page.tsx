@@ -46,6 +46,15 @@ export default function EditProfilePage() {
   const handleSave = async () => {
     setMessage("");
     try {
+      // Get current user data
+      const userData = localStorage.getItem("user");
+      if (!userData) {
+        setMessage("User not authenticated");
+        return;
+      }
+
+      const currentUser = JSON.parse(userData);
+
       const res = await fetch("/api/members/update", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -57,11 +66,17 @@ export default function EditProfilePage() {
           labels: labels ? labels.split(",").map((l) => l.trim()) : [],
           note,
           newsletter,
+          userId: currentUser.id, // Add userId to the request
         }),
       });
 
       const result = await res.text();
       if (res.ok) {
+        const responseData = JSON.parse(result);
+        // Update localStorage with new user data
+        const updatedUser = { ...currentUser, ...responseData.data };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
         setOpenModal(true);
         setMessage("Profile updated successfully!");
       } else {
